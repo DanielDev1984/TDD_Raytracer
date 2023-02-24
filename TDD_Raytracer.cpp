@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include "ArithmeticStructures.h"
 
 int main()
 {
