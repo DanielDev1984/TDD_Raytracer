@@ -16,8 +16,31 @@ public:
 	static HomogenousCoordinates addCoordinates(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) { const auto& [x1, y1, z1, w1] = c1; const auto& [x2, y2, z2, w2] = c2;
 	return HomogenousCoordinates{ x1+x2,y1+y2,z1+z2, w1+w2 }; };
 	//todo: add subtraction as well
+	static HomogenousCoordinates multiplyWithScalar(const HomogenousCoordinates& c, const float s) {
+		const auto& [x, y, z, w] = c;
 
+		return HomogenousCoordinates{ x*s,y*s,z*s,w };
+		
+		 };
+	static HomogenousCoordinates multiplyWithVector(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) {
+		const auto& [x1, y1, z1, w1] = c1;
+		const auto& [x2, y2, z2, w2] = c2;
 
+		return HomogenousCoordinates{ x1*x2,y1*y2,z1*z2,0.0 };
+	}
+	static float dotProduct(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) { const auto& [x1, y1, z1, w1] = c1; const auto& [x2, y2, z2, w2] = c2; return (x1*x2+y1*y2+z1*z2); };
+	static HomogenousCoordinates crossProduct(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) { 
+		float xNew, yNew, zNew;
+		constexpr float w{ 0.0 };
+		const auto& [x1, y1, z1, w1] = c1;
+		const auto& [x2, y2, z2, w2] = c2;
+		xNew = y1 * z2 - z1 * y2;
+		yNew = z1 * x2 - x1 * z2;
+		zNew = x1 * y2 - y1 * x2;
+		
+		return HomogenousCoordinates{ xNew,yNew,zNew,w }; };
+	float magnitude() { const auto& [x, y, z, w] = m_v; return sqrtf(x * x + y * y + z * z); };
+	HomogenousCoordinates getNormalizedVector() { const float factor{ 1.0f / magnitude() }; const auto& [x, y, z,w] = getVector(); return HomogenousCoordinates{ x*factor,y*factor,z*factor,0.0 }; };
 
 	void setPoint(float x, float y, float z) { auto& [pX, pY, pZ, pW] = m_p; pX = x; pY = y; pZ = z; };
 	HomogenousCoordinates getPoint() { return m_p; };
@@ -30,6 +53,6 @@ public:
 		// point
 		HomogenousCoordinates m_p{ 0.0,0.0,0.0,1.0 };
 		// vector
-		HomogenousCoordinates m_v{ 0.0,0.0,0.0,.0 };
+		HomogenousCoordinates m_v{ 0.0,0.0,0.0,0.0 };
 };
 
