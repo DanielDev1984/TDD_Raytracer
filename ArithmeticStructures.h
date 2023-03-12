@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 class ArithmeticStructures
 {
@@ -80,6 +81,7 @@ public:
 			{ rowData.at(0),rowData.at(1) };
 		};
 		float getElement(int m, int n) { return m_22.at(m).at(n); }
+		float getDeterminant() const { return (m_22.at(0).at(0)*m_22.at(1).at(1)) - (m_22.at(0).at(1)*m_22.at(1).at(0)); };
 	private:
 		const MatrixType type{  };
 		std::array<std::array<float, 2>, 2> m_22{};
@@ -100,8 +102,12 @@ public:
 			{ rowData.at(0),rowData.at(1), rowData.at(2) };
 		};
 
-		float getElement(int m, int n) { return m_33.at(m).at(n); }
+		float getElement(int m, int n)const { return m_33.at(m).at(n); }
+		float getDeterminant() const {
 
+			;
+			return (getElement(0, 0) * getCofactor(0, 0, *this) + getElement(0, 1) * getCofactor(0, 1, *this) + getElement(0, 2) * getCofactor(0, 2, *this));
+		};
 	private:
 		const MatrixType type{ };
 		std::array<std::array<float, 3>, 3> m_33{};
@@ -123,10 +129,193 @@ public:
 			m_44.at(rowNumber) =
 			{ rowData.at(0),rowData.at(1), rowData.at(2), rowData.at(3) };
 		};
-		float getElement(int m, int n) { return m_44.at(m).at(n); }
+		float getElement(int m, int n) const { return m_44.at(m).at(n); }
+		float getDeterminant() const {
+			//todo: fix really stupid (i.e. hardcoded) way of cofactor expansion (e.g.: https://math.libretexts.org/Bookshelves/Linear_Algebra/Interactive_Linear_Algebra_(Margalit_and_Rabinoff)/04%3A_Determinants/4.02%3A_Cofactor_Expansions) implementation by means of e.g. employing a for-loop!
+			auto subMatrix0{ getSubmatrixOf4x4Matrix(0,0,*this) };
+			auto subMatrix1{ getSubmatrixOf4x4Matrix(0,1,*this) };
+			auto subMatrix2{ getSubmatrixOf4x4Matrix(0,2,*this) };
+			auto subMatrix3{ getSubmatrixOf4x4Matrix(0,3,*this) };
+
+			auto cofactorSM0{ subMatrix0.getDeterminant() };
+			auto cofactorSM1{ -1.0 * subMatrix1.getDeterminant() };
+			auto cofactorSM2{ subMatrix2.getDeterminant() };
+			auto cofactorSM3{ -1.0 * subMatrix3.getDeterminant() };
+
+			return getElement(0, 0) * cofactorSM0 + 
+				getElement(0, 1) * cofactorSM1 + 
+				getElement(0, 2) * cofactorSM2 + 
+				getElement(0, 3) * cofactorSM3;
+		}; 
+		bool isInvertible() const { return getDeterminant() != 0; };
+		
 	private:
 		const MatrixType type{ };
 		std::array<std::array<float, 4>, 4> m_44{};
+	};
+
+	static Matrix4x4 getIdentityMatrix() {
+		row4x4 m0{ {1.0, 0.0, 0.0, 0.0} }, m1{ {0.0, 1.0, 0.0, 0.0} }, m2{ {0.0,0.0,1.0, 0.0} }, m3{ {0.0,0.0,0.0,1.0} };
+		return Matrix4x4{ m0, m1, m2, m3 };
+	}
+
+	static Matrix4x4 transposeMatrix(Matrix4x4& m) {
+		std::array<row4x4, 4> columnData;
+		for (int column = 0; column < 4; column++)
+		{
+			columnData.at(column) = m.getColumn(column);
+		}
+		for (int row = 0; row < 4; row++)
+		{
+			m.setMatrixData(row, columnData.at(row));
+			
+		}
+		return m;
+	}
+
+	static void inverseMatrix(Matrix4x4& m) {
+		if(!m.isInvertible())
+		{
+			std::cout << "------------ matrix not invertible --------------";
+				return;
+		}
+		
+		Matrix4x4 m_tmp{ getCofactorMatrix(m) };
+		transposeMatrix(m_tmp);
+		float const detM{ m.getDeterminant() };
+		std::array < row4x4, 4> rowBuffer{};
+		for (int row = 0; row < 4; row++)
+		{
+			for (int column = 0; column < 4; column++)
+			{
+				rowBuffer.at(row).at(column) = m_tmp.getElement(row, column) / detM;
+			}
+		}
+		for (int row = 0; row < 4; row++)
+		{
+			m.setMatrixData(row, rowBuffer.at(row));
+		}
+	
+	};
+	static Matrix4x4 getCofactorMatrix(Matrix4x4 m) {
+		// signs of cofactors
+		// | + - + - |
+		// | - + - + |
+		// | + - + - |
+		// | - + - + |
+		// row 0
+		auto subMatrix0{ getSubmatrixOf4x4Matrix(0,0,m) };
+		auto subMatrix1{ getSubmatrixOf4x4Matrix(0,1,m) };
+		auto subMatrix2{ getSubmatrixOf4x4Matrix(0,2,m) };
+		auto subMatrix3{ getSubmatrixOf4x4Matrix(0,3,m) };
+
+		auto cofactorSM0{ subMatrix0.getDeterminant() };
+		auto cofactorSM1{ -1.0 * subMatrix1.getDeterminant() };
+		auto cofactorSM2{ subMatrix2.getDeterminant() };
+		auto cofactorSM3{ -1.0 * subMatrix3.getDeterminant() };
+
+		row4x4 row0{ cofactorSM0, cofactorSM1, cofactorSM2, cofactorSM3 };
+
+		// row 1
+		auto subMatrix0_1{ getSubmatrixOf4x4Matrix(1,0,m) };
+		auto subMatrix1_1{ getSubmatrixOf4x4Matrix(1,1,m) };
+		auto subMatrix2_1{ getSubmatrixOf4x4Matrix(1,2,m) };
+		auto subMatrix3_1{ getSubmatrixOf4x4Matrix(1,3,m) };
+
+		cofactorSM0 = -1.0 *subMatrix0_1.getDeterminant();
+		cofactorSM1 =  subMatrix1_1.getDeterminant();
+		cofactorSM2 = -1.0 * subMatrix2_1.getDeterminant();
+		cofactorSM3 = subMatrix3_1.getDeterminant();
+
+		row4x4 row1{ cofactorSM0, cofactorSM1, cofactorSM2, cofactorSM3 };
+
+		// row 2
+		auto subMatrix0_2{ getSubmatrixOf4x4Matrix(2,0,m) };
+		auto subMatrix1_2{ getSubmatrixOf4x4Matrix(2,1,m) };
+		auto subMatrix2_2{ getSubmatrixOf4x4Matrix(2,2,m) };
+		auto subMatrix3_2{ getSubmatrixOf4x4Matrix(2,3,m) };
+
+		cofactorSM0 = subMatrix0_2.getDeterminant();
+		cofactorSM1 = -1.0 * subMatrix1_2.getDeterminant();
+		cofactorSM2 = subMatrix2_2.getDeterminant();
+		cofactorSM3 = -1.0 * subMatrix3_2.getDeterminant();
+
+		row4x4 row2{ cofactorSM0, cofactorSM1, cofactorSM2, cofactorSM3 };
+
+		// row 3
+		auto subMatrix0_3{ getSubmatrixOf4x4Matrix(3,0,m) };
+		auto subMatrix1_3{ getSubmatrixOf4x4Matrix(3,1,m) };
+		auto subMatrix2_3{ getSubmatrixOf4x4Matrix(3,2,m) };
+		auto subMatrix3_3{ getSubmatrixOf4x4Matrix(3,3,m) };
+
+		cofactorSM0 = -1.0*subMatrix0_3.getDeterminant();
+		cofactorSM1 = subMatrix1_3.getDeterminant();
+		cofactorSM2 = -1.0*subMatrix2_3.getDeterminant();
+		cofactorSM3 = subMatrix3_3.getDeterminant();
+
+		row4x4 row3{ cofactorSM0, cofactorSM1, cofactorSM2, cofactorSM3 };
+
+		return Matrix4x4{ row0, row1, row2, row3 };
+	};
+
+	static Matrix3x3 getSubmatrixOf4x4Matrix(int row, int column, Matrix4x4 m) {
+		row3x3 m0{ {1.0, 0.0, 0.0} }, m1{ {0.0, 1.0, 0.0} }, m2{ {0.0,0.0,1.0} };
+		std::array<float, 9> subMatrixValues{};
+		int i{ 0 };
+		for (int local_row = 0; local_row < 4; local_row++)
+		{
+			if (local_row != row)
+			{
+				for (int local_column = 0; local_column < 4; local_column++)
+				{
+					if (local_column != column)
+					{
+						subMatrixValues.at(i) = m.getElement(local_row, local_column);
+						i++;
+					}
+				}
+			}
+
+		}
+		return Matrix3x3{ row3x3{subMatrixValues.at(0), subMatrixValues.at(1), subMatrixValues.at(2)},
+			row3x3{subMatrixValues.at(3), subMatrixValues.at(4), subMatrixValues.at(5) },
+			row3x3{subMatrixValues.at(6), subMatrixValues.at(7), subMatrixValues.at(8)} };
+
+	};
+
+	static Matrix2x2 getSubmatrixOf3x3Matrix(int row, int column, Matrix3x3 m) {
+		row2x2 m0{ {1.0, 0.0} }, m1{ {0.0, 1.0} };
+		std::array<float, 4> subMatrixValues{};
+		int i{ 0 };
+		for (int local_row = 0; local_row < 3; local_row++)
+		{
+			if (local_row != row)
+			{
+				for (int local_column = 0; local_column < 3; local_column++)
+				{
+					if (local_column != column)
+					{
+						subMatrixValues.at(i) = m.getElement(local_row, local_column);
+						i++;
+					}
+				}
+			}
+
+		}
+		return Matrix2x2{ row2x2{subMatrixValues.at(0), subMatrixValues.at(1)},
+			row2x2{subMatrixValues.at(2), subMatrixValues.at(3)}};
+
+	};
+
+	static float  getMinor(int m, int n, const Matrix3x3 matrix) { const auto submatrix{getSubmatrixOf3x3Matrix(m,n,matrix)}; 
+	return submatrix.getDeterminant(); };
+
+	static float  getCofactor(int m, int n, const Matrix3x3 matrix) {
+		const bool negateMinor{ ((m+n) % 2 != 0) };
+
+		auto minor{ getMinor(m,n, matrix) };
+
+		return negateMinor ? -1.0*minor : minor;
 	};
 
 	static bool matricesAreEqual_2x2(Matrix2x2 m1, Matrix2x2 m2)
@@ -171,7 +360,11 @@ public:
 
 		for (int m = 0; m < m1.getRowM(0).size(); m++)
 		{
-			areEqual &= (m1.getRowM(m) == m2.getRowM(m));
+			for (int n = 0; n < m1.getColumn(0).size(); n++)
+			{
+
+				areEqual &= (floatsAreEqual(m1.getRowM(m).at(n), m2.getRowM(m).at(n)));
+			}
 		}
 
 		return areEqual;
