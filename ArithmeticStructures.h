@@ -403,6 +403,11 @@ public:
 		return HomogenousCoordinates{ returnValues.at(0),returnValues.at(1),returnValues.at(2),returnValues.at(3) };
 	}
 
+	static Matrix4x4 getTranslationMatrix(float x, float y, float z)
+	{
+		return getIdentityMatrix();
+	}
+
 	private:
 		// helper function to properly compare floats
 		static bool floatsAreEqual(float val1, float val2) { constexpr float epsilon{ 0.0001f }; return std::abs(val1 - val2) < epsilon; };
