@@ -405,7 +405,8 @@ public:
 
 	static Matrix4x4 getTranslationMatrix(float x, float y, float z)
 	{
-		return getIdentityMatrix();
+		row4x4 row0{ 1.0, 0.0, 0.0, x }, row1{ 0.0,1.0,0.0,y }, row2{ 0.0,0.0,1.0,z }, row3{ 0.0,0.0,0.0,1.0 };
+		return Matrix4x4{ row0, row1,row2,row3 };
 	}
 
 	private:
