@@ -409,6 +409,13 @@ public:
 		return Matrix4x4{ row0, row1,row2,row3 };
 	}
 
+	static Matrix4x4 getScalingMatrix(float scaleX, float scaleY, float scaleZ)
+	{
+		row4x4 row0{ scaleX, 0.0, 0.0, 0.0 }, row1{ 0.0,scaleY,0.0,0.0 }, row2{ 0.0,0.0,scaleZ,0.0 }, row3{ 0.0,0.0,0.0,1.0 };
+		return Matrix4x4{ row0, row1,row2,row3 };
+		
+	}
+
 	private:
 		// helper function to properly compare floats
 		static bool floatsAreEqual(float val1, float val2) { constexpr float epsilon{ 0.0001f }; return std::abs(val1 - val2) < epsilon; };
