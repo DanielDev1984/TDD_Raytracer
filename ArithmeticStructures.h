@@ -1,9 +1,11 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <tuple>
 #include <array>
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <math.h>
 
 class ArithmeticStructures
 {
@@ -414,6 +416,16 @@ public:
 		row4x4 row0{ scaleX, 0.0, 0.0, 0.0 }, row1{ 0.0,scaleY,0.0,0.0 }, row2{ 0.0,0.0,scaleZ,0.0 }, row3{ 0.0,0.0,0.0,1.0 };
 		return Matrix4x4{ row0, row1,row2,row3 };
 		
+	}
+
+	static float getRadiansForDeg(float deg)
+	{
+		return (deg / 180.0) * M_PI;
+	}
+
+	static Matrix4x4 getRotationMatrix_XAxis(float rad)
+	{
+		return getIdentityMatrix();
 	}
 
 	private:
