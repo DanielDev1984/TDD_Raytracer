@@ -425,7 +425,10 @@ public:
 
 	static Matrix4x4 getRotationMatrix_XAxis(float rad)
 	{
-		return getIdentityMatrix();
+		ArithmeticStructures::row4x4 m0{ {1.0, 0.0, 0.0,0.0} }, m1{ {0.0, cos(rad), -1.0 * sin(rad), 0.0} },
+			m2{ {0.0,sin(rad),cos(rad), 0.0} }, m3{ {0.0,0.0,0.0,1.0} };
+		ArithmeticStructures::Matrix4x4 rot_M{ m0, m1, m2, m3 };
+		return rot_M;
 	}
 
 	private:
