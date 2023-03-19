@@ -3,5 +3,6 @@
 class TDD_Raytracer
 {
 public:
-	void calculateProjectilePathway();
+	void calculateAndDrawProjectilePathway();
+	void calculateAndDrawClock();
 };
