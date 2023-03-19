@@ -431,6 +431,14 @@ public:
 		return rot_M;
 	}
 
+	static Matrix4x4 getRotationMatrix_YAxis(float rad)
+	{
+		ArithmeticStructures::row4x4 m0{ {cos(rad), 0.0, sin(rad),0.0} }, m1{ {0.0, 1.0, 0.0, 0.0} },
+			m2{ {-1.0*sin(rad),0.0, cos(rad), 0.0} }, m3{ {0.0,0.0,0.0,1.0} };
+		ArithmeticStructures::Matrix4x4 rot_M{ m0, m1, m2, m3 };
+		return rot_M;
+	}
+
 	private:
 		// helper function to properly compare floats
 		static bool floatsAreEqual(float val1, float val2) { constexpr float epsilon{ 0.0001f }; return std::abs(val1 - val2) < epsilon; };
