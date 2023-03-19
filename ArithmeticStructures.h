@@ -449,6 +449,14 @@ public:
 		return rot_M;
 	}
 
+	static Matrix4x4 getShearingMatrix(float xInPropToY, float xInPropToZ, float yInPropToX, float yInPropToZ, float zInPropToX, float zInPropToY)
+	{
+		ArithmeticStructures::row4x4 m0{ {1.0, xInPropToY,xInPropToZ,0.0} }, m1{ {yInPropToX, 1.0, yInPropToZ, 0.0} },
+			m2{ {zInPropToX, zInPropToY, 1.0, 0.0} }, m3{ {0.0,0.0,0.0,1.0} };
+		ArithmeticStructures::Matrix4x4 rot_M{ m0, m1, m2, m3 };
+		return rot_M;
+	}
+
 	private:
 		// helper function to properly compare floats
 		static bool floatsAreEqual(float val1, float val2) { constexpr float epsilon{ 0.0001f }; return std::abs(val1 - val2) < epsilon; };
