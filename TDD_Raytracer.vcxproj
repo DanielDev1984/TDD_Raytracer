@@ -147,12 +147,14 @@
     <ClCompile Include="ArithmeticStructures.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="PPMWriter.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="TDD_Raytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArithmeticStructures.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="PPMWriter.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="TDD_Raytracer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
