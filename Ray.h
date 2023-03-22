@@ -15,7 +15,12 @@ public:
 	ArithmeticStructures::HomogenousCoordinates getOrigin() { return m_as.getPoint(); };
 	ArithmeticStructures::HomogenousCoordinates getDirection() { return m_as.getVector(); };
 	ArithmeticStructures::HomogenousCoordinates getPosition(float t) {
-		return ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
+		// calculate the distance that is travelled in a certain ammount of time
+		const auto& [x, y, z, w] = ArithmeticStructures::multiplyWithScalar(getDirection(), t);
+		// "convert" this distance in a translation(matrix)
+		const auto& translationMatrix{ ArithmeticStructures::getTranslationMatrix(x,y,z) };
+		// and apply this translation to the rays origin / calculate the shifted point
+		return { ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, getOrigin()) };
 	};
 private:
 	ArithmeticStructures m_as; //todo: not sure whether this really is a good implementation...
