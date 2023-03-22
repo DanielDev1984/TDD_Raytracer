@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="ArithmeticStructures.cpp" />
     <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="GeometricStructures.cpp" />
     <ClCompile Include="PPMWriter.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="TDD_Raytracer.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="ArithmeticStructures.h" />
     <ClInclude Include="Canvas.h" />
+    <ClInclude Include="GeometricStructures.h" />
     <ClInclude Include="PPMWriter.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="TDD_Raytracer.h" />
