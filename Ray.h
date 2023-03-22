@@ -14,6 +14,9 @@ public:
 
 	ArithmeticStructures::HomogenousCoordinates getOrigin() { return m_as.getPoint(); };
 	ArithmeticStructures::HomogenousCoordinates getDirection() { return m_as.getVector(); };
+	ArithmeticStructures::HomogenousCoordinates getPosition(float t) {
+		return ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
+	};
 private:
 	ArithmeticStructures m_as; //todo: not sure whether this really is a good implementation...
 };
