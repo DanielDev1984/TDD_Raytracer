@@ -22,9 +22,9 @@ public:
 	// add given coordinates and return resulting point or vector
 	static HomogenousCoordinates addCoordinates(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) { const auto& [x1, y1, z1, w1] = c1; const auto& [x2, y2, z2, w2] = c2;
 	return HomogenousCoordinates{ x1+x2,y1+y2,z1+z2, w1+w2 }; };
-	//todo: add subtraction as well
 	static HomogenousCoordinates subtractCoordinates(const HomogenousCoordinates& c1, const HomogenousCoordinates& c2) {
-		return HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
+		const auto& [x1, y1, z1, w1] = c1; const auto& [x2, y2, z2, w2] = c2;
+		return HomogenousCoordinates{ x1 - x2,y1 - y2,z1 - z2, 0.0 };
 	};
 	static HomogenousCoordinates multiplyWithScalar(const HomogenousCoordinates& c, const float s) {
 		const auto& [x, y, z, w] = c;
