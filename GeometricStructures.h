@@ -13,7 +13,14 @@ public:
 			m_radius{ radius } {};
 		int getRadius() { return m_radius; };
 		ArithmeticStructures::HomogenousCoordinates getOrigin() { return m_origin; };
-		Intersections getIntersections(Ray ray) { return m_intersections; };
+		Intersections getIntersections(Ray ray) { 
+			// vector pointing from the center of the sphere to the origin of the ray
+			//todo: subtraction not implemented in arithmeticstructures
+			
+			
+			return m_intersections; 
+		
+		};
 	private:
 		int m_radius{};
 		ArithmeticStructures::HomogenousCoordinates m_origin{};
