@@ -15,3 +15,10 @@ ArithmeticStructures::HomogenousCoordinates Ray::getPosition(float t) {
 	// and apply this translation to the rays origin / calculate the shifted point
 	return { ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, getOrigin()) };
 };
+
+Ray Ray::translate(float x, float y, float z)
+{
+	ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,0.0,1.0 };
+	ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,0.0,0.0 };
+	return Ray{ origin, direction };
+}
