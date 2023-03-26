@@ -1,11 +1,11 @@
 #include "SceneObject.h"
 
-SceneObject::Intersections SceneObject::getIntersections(Ray ray)
+SceneObject::Intersections SceneObject::getSphereIntersections(Ray ray)
 {
 	// !! this intersection algorithm treats the ray as a line and will also return an intersection when the intersection lies "behind" the ray origin
 
 	// vector pointing from the center of the sphere to the origin of the ray
-	const auto vec_sphereToRay{ ArithmeticStructures::subtractCoordinates(ray.getOrigin(), m_geo.getOrigin()) };
+	const auto vec_sphereToRay{ ArithmeticStructures::subtractCoordinates(ray.getOrigin(), m_sphereGeo.getOrigin()) };
 	const auto a{ ArithmeticStructures::dotProduct(ray.getDirection(), ray.getDirection()) };
 	const auto b{ 2 * (ArithmeticStructures::dotProduct(ray.getDirection(), vec_sphereToRay)) };
 	const auto c{ ArithmeticStructures::dotProduct(vec_sphereToRay, vec_sphereToRay) - 1.0 };

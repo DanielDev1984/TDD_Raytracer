@@ -6,10 +6,10 @@ class SceneObject
 {
 public:
 	using Intersections = std::vector<float>;
-	SceneObject(GeometricStructures::Sphere geo) :m_geo{ GeometricStructures::Sphere(geo.getOrigin(), geo.getRadius()) } {};
-	Intersections getIntersections(Ray ray);
+	SceneObject(GeometricStructures::Sphere geo) :m_sphereGeo{ GeometricStructures::Sphere(geo.getOrigin(), geo.getRadius()) } {};
+	Intersections getSphereIntersections(Ray ray);
 private:
 	Intersections m_intersections{};
-	GeometricStructures::Sphere m_geo;
+	GeometricStructures::Sphere m_sphereGeo;
 };
 
