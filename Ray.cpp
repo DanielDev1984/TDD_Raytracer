@@ -16,9 +16,11 @@ ArithmeticStructures::HomogenousCoordinates Ray::getPosition(float t) {
 	return { ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, getOrigin()) };
 };
 
-Ray Ray::translate(float x, float y, float z)
+Ray Ray::translate(float shift_x, float shift_y, float shift_z)
 {
-	ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,0.0,1.0 };
-	ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,0.0,0.0 };
-	return Ray{ origin, direction };
+
+	auto transformationMatrix{ ArithmeticStructures::getTranslationMatrix(shift_x,shift_y,shift_z) };
+	const auto shiftedOrigin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
+
+	return Ray{ shiftedOrigin, getDirection() };
 }
