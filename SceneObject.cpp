@@ -1,5 +1,5 @@
 #include "SceneObject.h"
-
+#include <algorithm>
 SceneObject::Intersections SceneObject::getSphereIntersections(Ray ray)
 {
 	// !! this intersection algorithm treats the ray as a line and will also return an intersection when the intersection lies "behind" the ray origin
@@ -14,16 +14,50 @@ SceneObject::Intersections SceneObject::getSphereIntersections(Ray ray)
 	const auto discriminant{ pow(b,2) - 4 * a * c };
 
 	// no intersections between ray and spehere if discriminant < 0
-	m_intersections.clear();
+
 	if (discriminant >= 0)
 	{
 		// always calculate 2 intersections even if the sphere is only hit tangentially or the origin of the ray lies within the sphere
 		const auto t1{ (-1.0 * b - sqrt(discriminant)) / (2 * a) };
 		const auto t2{ (-1.0 * b + sqrt(discriminant)) / (2 * a) };
-		m_intersections.push_back(t1);
-		m_intersections.push_back(t2);
+		m_intersections.at(0) = t1;
+		m_intersections.at(1) = t2;
+	}
+	else
+	{
+		// somehow it has to be indicated that there is no intersection 
+		m_intersections.fill(Invalid); //todo: maybe fill with NAN instead?!
 	}
 
 	return m_intersections;
 
 };
+
+float SceneObject::getSphereHit(Ray ray)
+{
+	float hit{ NAN }; // init with NAN to indicate on the call-site whether there are hits at all
+	std::vector<float> potentialHits{};
+	potentialHits.clear();
+	const auto sphereIntersections{ getSphereIntersections(ray) };
+	// first identify potential hits 
+	for (const auto & currentSphereIntersection : sphereIntersections)
+	{
+		if (currentSphereIntersection >= 0.0 && currentSphereIntersection != Invalid)
+		{
+			potentialHits.push_back(currentSphereIntersection);
+		}
+	}
+	if (!potentialHits.empty())
+	{
+		if (potentialHits.size() > 1)
+		{
+			
+			hit = std::min(potentialHits.at(0), potentialHits.at(1));
+		}
+		else
+		{
+			hit = potentialHits.at(0);
+		}
+	}
+	return hit;
+}
