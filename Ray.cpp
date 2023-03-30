@@ -26,6 +26,8 @@ Ray Ray::translate(float shift_x, float shift_y, float shift_z)
 
 Ray Ray::scale(float scale_x, float scale_y, float scale_z)
 {
-	ArithmeticStructures::HomogenousCoordinates scaled_Origin{ 0.0,0.0,0.0,1.0 }, scaled_Direction{ 0.0,0.0,0.0,0.0 };
+	auto transformationMatrix{ ArithmeticStructures::getScalingMatrix(scale_x,scale_y,scale_z) };
+	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
+	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getDirection()) };
 	return Ray{scaled_Origin, scaled_Direction};
 }
