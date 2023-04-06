@@ -10,7 +10,7 @@ public:
 	SceneObject(GeometricStructures::Sphere geo) :m_sphereGeo{ GeometricStructures::Sphere(geo.getOrigin(), geo.getRadius()) }, m_transformation{ ArithmeticStructures::getIdentityMatrix() } {};
 	Intersections getSphereIntersections(Ray ray);
 	ArithmeticStructures::Matrix4x4 getSphereTransformation() { return m_transformation; };
-	//void setSphereTransformation(ArithmeticStructures::Matrix4x4 transformation) { m_transformation = transformation; };
+	void setSphereTransformation(ArithmeticStructures::Matrix4x4 transformation) { m_transformation = transformation; };
 	float getSphereHit(Ray ray);
 	static constexpr float Invalid{ -123456.0 };
 private:
