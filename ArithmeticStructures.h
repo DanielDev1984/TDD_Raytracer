@@ -125,12 +125,20 @@ public:
 			{m2.at(0),m2.at(1), m2.at(2), m2.at(3)},
 			{m3.at(0),m3.at(1), m3.at(2), m3.at(3)}
 			}
-		}, type{ MatrixType::Matrix4x4 } {}
+		}, type{ MatrixType::Matrix4x4 } {};
+		const Matrix4x4& operator=(Matrix4x4 obj) {//todo: make argument const&
+			setMatrixData(0,obj.getRowM(0));
+			setMatrixData(1, obj.getRowM(1));
+			setMatrixData(2, obj.getRowM(2));
+			setMatrixData(3, obj.getRowM(3));
+		
+			return *this;
+		};
 		MatrixType getType() { return type; };
-		int getMatrixSize() { return m_44.size() * m_44.at(0).size(); }
-		std::array<float, 4> getRowM(int m) { return m_44.at(m); }
+		int getMatrixSize() { return m_44.size() * m_44.at(0).size(); };
+		const std::array<float, 4> getRowM(int m) { return m_44.at(m); } const
 		std::array<float, 4> getColumn(int n) { return std::array<float, 4>{ {m_44.at(0).at(n), m_44.at(1).at(n), m_44.at(2).at(n), m_44.at(3).at(n)} }; }
-		void setMatrixData(int rowNumber, row4x4 rowData) {
+		void setMatrixData(int rowNumber, const row4x4 rowData) {
 			m_44.at(rowNumber) =
 			{ rowData.at(0),rowData.at(1), rowData.at(2), rowData.at(3) };
 		};
