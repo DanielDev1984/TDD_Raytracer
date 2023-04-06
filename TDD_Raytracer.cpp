@@ -11,7 +11,8 @@ int main()
 {
 	TDD_Raytracer raytracer{};
 	//raytracer.calculateAndDrawProjectilePathway();
-	raytracer.calculateAndDrawClock();
+	//raytracer.calculateAndDrawClock();
+	raytracer.drawSphereWithoutReflection();
 	
 
 }   
@@ -142,5 +143,21 @@ void TDD_Raytracer::calculateAndDrawClock()
 		}
 	}
 
+	imageWriter.createPPM(referenceCanvas);
+}
+
+void TDD_Raytracer::drawSphereWithoutReflection()
+{
+	Canvas referenceCanvas(256, 256);
+	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWOReflection.ppm" };
+	
+
+	for (auto x = 0; x < referenceCanvas.getDimX(); x++)
+	{
+		for (auto y = 0; y < referenceCanvas.getDimY(); y++)
+		{
+			referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(255.0),(int)(0.0),(int)(0.0),1.0 });
+		}
+	}
 	imageWriter.createPPM(referenceCanvas);
 }
