@@ -31,3 +31,10 @@ Ray Ray::scale(float scale_x, float scale_y, float scale_z)
 	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getDirection()) };
 	return Ray{scaled_Origin, scaled_Direction};
 }
+
+Ray Ray::scale(ArithmeticStructures::Matrix4x4 transformationMatrix)
+{
+	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
+	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getDirection()) };
+	return Ray{ scaled_Origin, scaled_Direction };
+}

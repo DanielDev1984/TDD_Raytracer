@@ -4,6 +4,8 @@ SceneObject::Intersections SceneObject::getSphereIntersections(Ray ray)
 {
 	// !! this intersection algorithm treats the ray as a line and will also return an intersection when the intersection lies "behind" the ray origin
 
+	//ray.scale(ArithmeticStructures::inverseMatrix(getSphereTransformation));
+
 	// vector pointing from the center of the sphere to the origin of the ray
 	const auto vec_sphereToRay{ ArithmeticStructures::subtractCoordinates(ray.getOrigin(), m_sphereGeo.getOrigin()) };
 	const auto a{ ArithmeticStructures::dotProduct(ray.getDirection(), ray.getDirection()) };

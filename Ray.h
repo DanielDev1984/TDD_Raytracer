@@ -13,6 +13,7 @@ public:
 	ArithmeticStructures::HomogenousCoordinates getPosition(float t);
 	Ray translate(float shift_x, float shift_y, float shift_z);
 	Ray scale(float scale_x, float scale_y, float scale_z);
+	Ray scale(ArithmeticStructures::Matrix4x4);
 private:
 	ArithmeticStructures m_as; //todo: not sure whether this really is a good implementation...
 };
