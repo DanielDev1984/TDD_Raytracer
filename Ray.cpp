@@ -16,25 +16,32 @@ ArithmeticStructures::HomogenousCoordinates Ray::getPosition(float t) {
 	return { ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, getOrigin()) };
 };
 
+Ray Ray::translate(ArithmeticStructures::Matrix4x4 translationMatrix)
+{
+	const auto shiftedOrigin{ ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, getOrigin()) };
+
+	return Ray{ shiftedOrigin, getDirection() };
+}
+
 Ray Ray::translate(float shift_x, float shift_y, float shift_z)
 {
 	auto transformationMatrix{ ArithmeticStructures::getTranslationMatrix(shift_x,shift_y,shift_z) };
 	const auto shiftedOrigin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
 
 	return Ray{ shiftedOrigin, getDirection() };
-}
+};
 
 Ray Ray::scale(float scale_x, float scale_y, float scale_z)
 {
-	auto transformationMatrix{ ArithmeticStructures::getScalingMatrix(scale_x,scale_y,scale_z) };
-	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
-	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getDirection()) };
-	return Ray{scaled_Origin, scaled_Direction};
-}
-
-Ray Ray::scale(ArithmeticStructures::Matrix4x4 transformationMatrix)
-{
-	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getOrigin()) };
-	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, getDirection()) };
+	auto scalingMatrix{ ArithmeticStructures::getScalingMatrix(scale_x,scale_y,scale_z) };
+	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(scalingMatrix, getOrigin()) };
+	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(scalingMatrix, getDirection()) };
 	return Ray{ scaled_Origin, scaled_Direction };
-}
+};
+
+Ray Ray::scale(ArithmeticStructures::Matrix4x4 scalingMatrix)
+{
+	const auto scaled_Origin{ ArithmeticStructures::multiplyMatrixWithTuple(scalingMatrix, getOrigin()) };
+	const auto scaled_Direction{ ArithmeticStructures::multiplyMatrixWithTuple(scalingMatrix, getDirection()) };
+	return Ray{ scaled_Origin, scaled_Direction };
+};

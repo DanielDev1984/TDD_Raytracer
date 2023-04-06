@@ -12,8 +12,9 @@ public:
 	ArithmeticStructures::HomogenousCoordinates getDirection() { return m_as.getVector(); };
 	ArithmeticStructures::HomogenousCoordinates getPosition(float t);
 	Ray translate(float shift_x, float shift_y, float shift_z);
+	Ray translate(ArithmeticStructures::Matrix4x4 translationMatrix);
 	Ray scale(float scale_x, float scale_y, float scale_z);
-	Ray scale(ArithmeticStructures::Matrix4x4);
+	Ray scale(ArithmeticStructures::Matrix4x4 scalingMatrix);
 private:
 	ArithmeticStructures m_as; //todo: not sure whether this really is a good implementation...
 };

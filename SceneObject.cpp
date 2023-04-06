@@ -4,14 +4,20 @@ SceneObject::Intersections SceneObject::getSphereIntersections(Ray ray)
 {
 	// !! this intersection algorithm treats the ray as a line and will also return an intersection when the intersection lies "behind" the ray origin
 
-	auto tmpTransformation{ getSphereTransformation() };
-	ArithmeticStructures::inverseMatrix(tmpTransformation);
-	auto scaledRayLocal{ ray.scale(tmpTransformation) }; //todo: right now only scaling is considered -> consider all types of transformations!
+	auto scaleTransformation{ getSphereScaling() };
+	ArithmeticStructures::inverseMatrix(scaleTransformation);
+	auto scaledRayLocal{ ray.scale(scaleTransformation) };
+
+	auto shiftTransformation{ getSphereTranslation() };
+	ArithmeticStructures::inverseMatrix(shiftTransformation);
+	auto scaledAndShiftedRayLocal{ scaledRayLocal.translate(shiftTransformation) }; 
+	//todo: right now rotation is not considered!
+
 
 	// vector pointing from the center of the sphere to the origin of the ray
-	const auto vec_sphereToRay{ ArithmeticStructures::subtractCoordinates(scaledRayLocal.getOrigin(), m_sphereGeo.getOrigin()) };
-	const auto a{ ArithmeticStructures::dotProduct(scaledRayLocal.getDirection(), scaledRayLocal.getDirection()) };
-	const auto b{ 2 * (ArithmeticStructures::dotProduct(scaledRayLocal.getDirection(), vec_sphereToRay)) };
+	const auto vec_sphereToRay{ ArithmeticStructures::subtractCoordinates(scaledAndShiftedRayLocal.getOrigin(), m_sphereGeo.getOrigin()) };
+	const auto a{ ArithmeticStructures::dotProduct(scaledAndShiftedRayLocal.getDirection(), scaledAndShiftedRayLocal.getDirection()) };
+	const auto b{ 2 * (ArithmeticStructures::dotProduct(scaledAndShiftedRayLocal.getDirection(), vec_sphereToRay)) };
 	const auto c{ ArithmeticStructures::dotProduct(vec_sphereToRay, vec_sphereToRay) - 1.0 };
 
 	// standard way of determining LINE (!= ray) sphere intersection
