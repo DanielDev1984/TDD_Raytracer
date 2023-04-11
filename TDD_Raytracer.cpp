@@ -6,13 +6,15 @@
 #include "ArithmeticStructures.h"
 #include "PPMWriter.h"
 #include "Canvas.h"
+#include "GeometricStructures.h"
+#include "SceneObject.h"
 
 int main()
 {
 	TDD_Raytracer raytracer{};
 	//raytracer.calculateAndDrawProjectilePathway();
 	//raytracer.calculateAndDrawClock();
-	raytracer.drawSphereWithoutReflection();
+	raytracer.drawSphereWithBasicShading();
 	
 
 }   
@@ -146,17 +148,47 @@ void TDD_Raytracer::calculateAndDrawClock()
 	imageWriter.createPPM(referenceCanvas);
 }
 
-void TDD_Raytracer::drawSphereWithoutReflection()
+void TDD_Raytracer::drawSphereWithBasicShading()
 {
 	Canvas referenceCanvas(256, 256);
-	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWOReflection.ppm" };
+	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWithBasicShading.ppm" };
 	
+	const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+	constexpr int sphere_Radius{ 1 };
+	GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+	SceneObject sO{ sphere };
+	const float uniformSphereScale{ referenceCanvas.getDimX() / 2.0f };
+	const float scale_x{ uniformSphereScale }, scale_y{ uniformSphereScale }, scale_z{ uniformSphereScale};
+	const float shift_x{ 1.0f }, shift_y{  1.0f }, shift_z{ 1.0 }; //todo: why is 1.0 enough to move the sphere to the center???
+	sO.setSphereScaling(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
+	sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
+
+	std::vector<float> hitValues{};
 
 	for (auto x = 0; x < referenceCanvas.getDimX(); x++)
 	{
 		for (auto y = 0; y < referenceCanvas.getDimY(); y++)
 		{
-			referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(255.0),(int)(0.0),(int)(0.0),1.0 });
+			// ray is in front of the sphere!
+			const ArithmeticStructures::HomogenousCoordinates origin{ x,y,0.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
+			Ray ray{ origin, direction };
+
+			//SceneObject::Intersections actualIntersections{ sO.getSphereIntersections(ray) };
+			auto actualHit{ sO.getSphereHit(ray) };
+			
+			//if (actualIntersections.at(0) > 0)
+			if(!std::isnan(actualHit))
+			{
+				//hitValues.push_back(actualHit);
+				referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ 255-(int)(actualHit),(int)(0.0),(int)(0.0),1.0 });
+			}
+			else
+			{
+				referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(0.0),(int)(0.0),(int)(0.0),1.0 });
+			}
+
+			
 		}
 	}
 	imageWriter.createPPM(referenceCanvas);
