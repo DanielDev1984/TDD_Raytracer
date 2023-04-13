@@ -71,3 +71,9 @@ float SceneObject::getSphereHit(Ray ray)
 	}
 	return hit;
 }
+
+// ! this function doesnt explicitly normalize the returned vector as the returned vector is a unitvector already !
+ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnUnitSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphere)
+{
+	return ArithmeticStructures::subtractCoordinates(pointOnSphere, m_sphereGeo.getOrigin());
+}
