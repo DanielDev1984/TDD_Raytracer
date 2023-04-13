@@ -14,6 +14,8 @@ public:
 	ArithmeticStructures::Matrix4x4 getSphereTranslation() { return m_shifTransformation; };
 	void setSphereTranslation(ArithmeticStructures::Matrix4x4 shiftTransformation) { m_shifTransformation = shiftTransformation; };
 	float getSphereHit(Ray ray);
+	ArithmeticStructures::HomogenousCoordinates getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphere) { return ArithmeticStructures::HomogenousCoordinates(0.0, 0.0, 0.0, 0.0); };
+
 	static constexpr float Invalid{ -123456.0 };
 private:
 	Intersections m_intersections{};
