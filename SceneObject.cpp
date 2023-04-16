@@ -72,9 +72,23 @@ float SceneObject::getSphereHit(Ray ray)
 	return hit;
 }
 
-ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnUnitSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphere)
+ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates)
 {
-	// ! this function doesnt explicitly normalize the returned vector as the returned vector is a unitvector already !
 	_ASSERT(m_sphereGeo.getRadius() == 1);
-	return ArithmeticStructures::subtractCoordinates(pointOnSphere, m_sphereGeo.getOrigin());
+
+	// transform pointOnSphereInWorldCoordinates to object coordinate system
+	auto invertedMatrix{ m_shifTransformation };
+	ArithmeticStructures::inverseMatrix(invertedMatrix);
+	auto const pointOnSphereInObjectCoordinates{ ArithmeticStructures::multiplyMatrixWithTuple( invertedMatrix, pointOnSphereInWorldCoordinates) };
+	// calculate normal in object coordinate system
+	auto normalInObjectSpace{ ArithmeticStructures::subtractCoordinates(pointOnSphereInObjectCoordinates, m_sphereGeo.getOrigin()) };
+
+	// transform normal from object coordinate system back to world coordinate system (taking stretichng etc into account!)
+	ArithmeticStructures::transposeMatrix(invertedMatrix);
+	auto normalInWorldSpace{ ArithmeticStructures::multiplyMatrixWithTuple(invertedMatrix, normalInObjectSpace) };
+
+	// hack for compensating messed w coordinate when translating
+	auto& [x, y, z, w] = normalInWorldSpace;
+	w = 0.0;
+	return normalInWorldSpace;
 }

@@ -14,7 +14,8 @@ public:
 	ArithmeticStructures::Matrix4x4 getSphereTranslation() { return m_shifTransformation; };
 	void setSphereTranslation(ArithmeticStructures::Matrix4x4 shiftTransformation) { m_shifTransformation = shiftTransformation; };
 	float getSphereHit(Ray ray);
-	ArithmeticStructures::HomogenousCoordinates getNormalOnUnitSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphere);
+	// this function returns a normal vector in world coordinates at the point of interest
+	ArithmeticStructures::HomogenousCoordinates getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates);
 
 	static constexpr float Invalid{ -123456.0 };
 private:
