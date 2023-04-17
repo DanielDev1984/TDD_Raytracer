@@ -77,7 +77,7 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfac
 	_ASSERT(m_sphereGeo.getRadius() == 1);
 
 	// transform pointOnSphereInWorldCoordinates to object coordinate system
-	auto invertedMatrix{ m_shifTransformation };
+	auto invertedMatrix{ m_transformation };
 	ArithmeticStructures::inverseMatrix(invertedMatrix);
 	auto const pointOnSphereInObjectCoordinates{ ArithmeticStructures::multiplyMatrixWithTuple( invertedMatrix, pointOnSphereInWorldCoordinates) };
 	// calculate normal in object coordinate system
@@ -87,8 +87,16 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfac
 	ArithmeticStructures::transposeMatrix(invertedMatrix);
 	auto normalInWorldSpace{ ArithmeticStructures::multiplyMatrixWithTuple(invertedMatrix, normalInObjectSpace) };
 
-	// hack for compensating messed w coordinate when translating
-	auto& [x, y, z, w] = normalInWorldSpace;
-	w = 0.0;
+	//todo: calculating the normal needs to be optimized
+	ArithmeticStructures aS;
+	auto [x, y, z, w] = normalInWorldSpace;
+	aS.setVector(x, y, z);
+
+	// normalize vector AND hack for compensating messed w coordinate when translating
+	auto [x_n, y_n, z_n, w_n] = aS.getNormalizedVector();
+	
+	normalInWorldSpace = ArithmeticStructures::HomogenousCoordinates{ x_n,y_n,z_n,0.0 };
+
+
 	return normalInWorldSpace;
 }
