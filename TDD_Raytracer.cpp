@@ -164,6 +164,11 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
 
 	std::vector<float> hitValues{};
+	const auto imageSize{ referenceCanvas.getDimX() * referenceCanvas.getDimY() };
+	int progress{ 0 };
+	int previousStep{ 0 };
+	std::cout << "starting raytracing\n";
+	std::cout << "Progress [%] : ";
 
 	for (auto x = 0; x < referenceCanvas.getDimX(); x++)
 	{
@@ -187,9 +192,15 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 			{
 				referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(0.0),(int)(0.0),(int)(0.0),1.0 });
 			}
-
-			
+			// convenience function for debug / progress output
+			progress = int((x * referenceCanvas.getDimY() + y ) * 100 / imageSize);
+			if ((progress % 5 == 0) && (previousStep != progress))
+			{
+				previousStep = progress;
+				std::cout << "|" << " " << progress;
+			}
 		}
 	}
+	std::cout << "\nend raytracing, write ppm";
 	imageWriter.createPPM(referenceCanvas);
 }
