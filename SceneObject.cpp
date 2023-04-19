@@ -100,3 +100,11 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfac
 
 	return normalInWorldSpace;
 }
+
+ArithmeticStructures::HomogenousCoordinates SceneObject::getReflectedVectorAroundNormal(ArithmeticStructures::HomogenousCoordinates inVec, ArithmeticStructures::HomogenousCoordinates n)
+{
+	// calculate the reflected vector according to this formula: in - (n * 2 * dot(in, n))
+	auto dP{ ArithmeticStructures::dotProduct(inVec, n) };
+	auto helperVector{ ArithmeticStructures::multiplyWithScalar(n, 2.0 * dP) };
+	return ArithmeticStructures::subtractCoordinates(inVec, helperVector);
+}
