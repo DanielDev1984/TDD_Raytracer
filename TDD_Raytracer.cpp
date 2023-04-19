@@ -168,7 +168,6 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	int progress{ 0 };
 	int previousStep{ 0 };
 	std::cout << "starting raytracing\n";
-	std::cout << "Progress [%] : ";
 
 	for (auto x = 0; x < referenceCanvas.getDimX(); x++)
 	{
@@ -194,13 +193,25 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 			}
 			// convenience function for debug / progress output
 			progress = int((x * referenceCanvas.getDimY() + y ) * 100 / imageSize);
-			if ((progress % 5 == 0) && (previousStep != progress))
-			{
-				previousStep = progress;
-				std::cout << "|" << " " << progress;
-			}
+			updateProgressBar(progress);
 		}
 	}
 	std::cout << "\nend raytracing, write ppm";
 	imageWriter.createPPM(referenceCanvas);
+}
+
+void TDD_Raytracer::updateProgressBar(int progressPercentage)
+{
+	if (!m_progressBarInitialized)
+	{
+		initProgressBar();
+		m_progressBarInitialized = true;
+	}
+
+	if ((progressPercentage % s_progressBarStepSize == 0) && (m_progress != progressPercentage))
+	{
+		m_progress = progressPercentage;
+		std::cout << "|" << " " << progressPercentage;
+	}
+	
 }
