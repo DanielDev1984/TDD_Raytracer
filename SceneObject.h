@@ -22,6 +22,7 @@ public:
 	float getSphereHit(Ray ray);
 	// this function returns a normal vector in world coordinates at the point of interest
 	ArithmeticStructures::HomogenousCoordinates getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates);
+	ArithmeticStructures::HomogenousCoordinates getReflectedVectorAroundNormal(ArithmeticStructures::HomogenousCoordinates inVec, ArithmeticStructures::HomogenousCoordinates n) { return ArithmeticStructures::HomogenousCoordinates{0.0,0.0,0.0,0.0}; };
 
 	static constexpr float Invalid{ -123456.0 };
 private:
