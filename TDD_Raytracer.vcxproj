@@ -147,6 +147,7 @@
     <ClCompile Include="ArithmeticStructures.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="GeometricStructures.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="PPMWriter.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="SceneObject.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="ArithmeticStructures.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="GeometricStructures.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="PPMWriter.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="SceneObject.h" />
