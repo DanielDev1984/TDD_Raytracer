@@ -25,7 +25,8 @@ public:
 	ArithmeticStructures::HomogenousCoordinates getReflectedVectorAroundNormal(ArithmeticStructures::HomogenousCoordinates inVec, ArithmeticStructures::HomogenousCoordinates n);
 
 	static constexpr float Invalid{ -123456.0 };
-
+	
+	//todo: outsource lightsource ?
 	struct LightSource {
 		LightSource(ArithmeticStructures::HomogenousCoordinates intensity, ArithmeticStructures::HomogenousCoordinates position) : m_intensity{ intensity }, m_position{ position } {};
 		ArithmeticStructures::HomogenousCoordinates getIntensity() { return m_intensity; };
