@@ -1,6 +1,7 @@
 #pragma once
 #include "ArithmeticStructures.h"
 #include "GeometricStructures.h"
+#include "Material.h"
 #include "Ray.h"
 #include <array>
 class SceneObject
@@ -9,7 +10,7 @@ public:
 	using Intersections = std::array<float,2>;
 	SceneObject(GeometricStructures::Sphere geo) :m_sphereGeo{ GeometricStructures::Sphere(geo.getOrigin(), geo.getRadius()) }, m_scaleTransformation{ ArithmeticStructures::getIdentityMatrix() }, 
 		m_shifTransformation{ ArithmeticStructures::getIdentityMatrix() },
-		m_transformation{ ArithmeticStructures::getIdentityMatrix() }
+		m_transformation{ ArithmeticStructures::getIdentityMatrix()}, m_material{Material()} 
 	{};
 	Intersections getSphereIntersections(Ray ray);
 	ArithmeticStructures::Matrix4x4 getSphereScaling() { return m_scaleTransformation; };
@@ -18,7 +19,8 @@ public:
 	void setSphereTranslation(ArithmeticStructures::Matrix4x4 shiftTransformation) { m_shifTransformation = shiftTransformation; };
 
 	void setSphereTransformation(ArithmeticStructures::Matrix4x4 transformation) { m_transformation = transformation; };
-
+	void setSphereMaterial(Material material) { m_material = material; };
+	Material getSphereMaterial() { return m_material; };
 	float getSphereHit(Ray ray);
 	// this function returns a normal vector in world coordinates at the point of interest
 	ArithmeticStructures::HomogenousCoordinates getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates);
@@ -43,5 +45,6 @@ private:
 	ArithmeticStructures::Matrix4x4 m_scaleTransformation;
 	ArithmeticStructures::Matrix4x4 m_shifTransformation;
 	ArithmeticStructures::Matrix4x4 m_transformation;
+	Material m_material{};
 };
 
