@@ -7,6 +7,16 @@
 class SceneObject
 {
 public:
+	//todo: outsource lightsource ?
+	struct LightSource {
+		LightSource(ArithmeticStructures::HomogenousCoordinates intensity, ArithmeticStructures::HomogenousCoordinates position) : m_intensity{ intensity }, m_position{ position } {};
+		ArithmeticStructures::HomogenousCoordinates getIntensity() { return m_intensity; };
+		ArithmeticStructures::HomogenousCoordinates getPosition() { return m_position; };
+	private:
+		ArithmeticStructures::HomogenousCoordinates m_intensity;
+		ArithmeticStructures::HomogenousCoordinates m_position;
+	};
+
 	using Intersections = std::array<float,2>;
 	SceneObject(GeometricStructures::Sphere geo) :m_sphereGeo{ GeometricStructures::Sphere(geo.getOrigin(), geo.getRadius()) }, m_scaleTransformation{ ArithmeticStructures::getIdentityMatrix() }, 
 		m_shifTransformation{ ArithmeticStructures::getIdentityMatrix() },
@@ -22,21 +32,19 @@ public:
 	void setSphereMaterial(Material material) { m_material = material; };
 	Material getSphereMaterial() { return m_material; };
 	float getSphereHit(Ray ray);
+	ArithmeticStructures::HomogenousCoordinates getPhongShadedSurfaceColor(
+		Material m, 
+		LightSource l, 
+		ArithmeticStructures::HomogenousCoordinates pointOnSurface, 
+		ArithmeticStructures::HomogenousCoordinates surfaceNormalAtPointOfInterest, 
+		ArithmeticStructures::HomogenousCoordinates eyeVector);
 	// this function returns a normal vector in world coordinates at the point of interest
 	ArithmeticStructures::HomogenousCoordinates getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates);
 	ArithmeticStructures::HomogenousCoordinates getReflectedVectorAroundNormal(ArithmeticStructures::HomogenousCoordinates inVec, ArithmeticStructures::HomogenousCoordinates n);
 
 	static constexpr float Invalid{ -123456.0 };
 	
-	//todo: outsource lightsource ?
-	struct LightSource {
-		LightSource(ArithmeticStructures::HomogenousCoordinates intensity, ArithmeticStructures::HomogenousCoordinates position) : m_intensity{ intensity }, m_position{ position } {};
-		ArithmeticStructures::HomogenousCoordinates getIntensity() { return m_intensity; };
-		ArithmeticStructures::HomogenousCoordinates getPosition() { return m_position; };
-	private:
-		ArithmeticStructures::HomogenousCoordinates m_intensity;
-		ArithmeticStructures::HomogenousCoordinates m_position;
-	};
+	
 
 private:
 	Intersections m_intersections{};

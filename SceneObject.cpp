@@ -72,6 +72,16 @@ float SceneObject::getSphereHit(Ray ray)
 	return hit;
 }
 
+ArithmeticStructures::HomogenousCoordinates SceneObject::getPhongShadedSurfaceColor(
+	Material m,
+	SceneObject::LightSource l,
+	ArithmeticStructures::HomogenousCoordinates pointOnSurface,
+	ArithmeticStructures::HomogenousCoordinates surfaceNormalAtPointOfInterest,
+	ArithmeticStructures::HomogenousCoordinates eyeVector)
+{
+	return ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
+}
+
 ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates)
 {
 	_ASSERT(m_sphereGeo.getRadius() == 1);
