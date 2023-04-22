@@ -79,6 +79,7 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getPhongShadedSurfaceCo
 	ArithmeticStructures::HomogenousCoordinates surfaceNormalAtPointOfInterest,
 	ArithmeticStructures::HomogenousCoordinates eyeVector)
 {
+
 	return ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
 }
 
