@@ -79,8 +79,41 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getPhongShadedSurfaceCo
 	ArithmeticStructures::HomogenousCoordinates surfaceNormalAtPointOfInterest,
 	ArithmeticStructures::HomogenousCoordinates eyeVector)
 {
+	ArithmeticStructures::HomogenousCoordinates ambientColor{ 0.0,0.0,0.0,1.0 }, diffuseColor{ 0.0,0.0,0.0,1.0 }, specularColor{ 0.0,0.0,0.0,1.0 };
+	auto combinedMaterialAndLightColor{ ArithmeticStructures::multiplyWithVector(m.getColor(), l.getColor()) };
+	auto surfacePointToLightVector{ArithmeticStructures::subtractCoordinates(l.getPosition(),pointOnSurface)};
+	ArithmeticStructures aS{};
+	auto [x,y,z,w] = surfacePointToLightVector; //todo: make this procedure of creating a normal more convenient on ArithmeticStructures side !
+	aS.setVector(x,y,z);
+	auto normalizedSurfacePointToLightVector{ aS.getNormalizedVector() };
+	ambientColor = ArithmeticStructures::multiplyWithScalar(combinedMaterialAndLightColor, m.getAmbientReflectionFactor()) ;
+	auto relationLightToNormal{ArithmeticStructures::dotProduct(surfaceNormalAtPointOfInterest, normalizedSurfacePointToLightVector)};
+	// if relationLightToNormal < 0, point is on other side of surface, no diffuse and no specular color
+	if (relationLightToNormal >= 0)
+	{
+		// calculating final diffuseColor
+		auto finalDiffuseFactor = m.getDiffuseReflectionFactor() * relationLightToNormal;
+		diffuseColor = ArithmeticStructures::multiplyWithScalar(combinedMaterialAndLightColor, finalDiffuseFactor);
 
-	return ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,0.0,1.0 };
+		// calculating final specularColor
+		auto reflectedVector{getReflectedVectorAroundNormal(ArithmeticStructures::multiplyWithScalar(normalizedSurfacePointToLightVector,-1.0) ,surfaceNormalAtPointOfInterest)};
+		auto relationEyeToReflectionVector{ArithmeticStructures::dotProduct(reflectedVector, eyeVector)};
+		// if relationEyeToReflectionVector < 0, no specular color
+		if (relationEyeToReflectionVector >= 0)
+		{
+			relationEyeToReflectionVector = pow(relationEyeToReflectionVector, m.getShininessFactor());
+			auto finalSpecularFactor{ m.getSpecularReflectionFactor() * relationEyeToReflectionVector };
+			specularColor = ArithmeticStructures::multiplyWithScalar(l.getColor(), finalSpecularFactor);
+		}
+	}
+	// final Phong shaded color = ambient + diffuse + specular color
+	
+	auto finalColor{ ArithmeticStructures::addCoordinates(ArithmeticStructures::addCoordinates(ambientColor, diffuseColor), specularColor) };
+	// reset w just to be on the safe side
+	//todo: use a better function for adding colors / make sure the w component doesnt exceed 1.0
+	auto& [finalColor_x, finalColor_y, finalColor_z, finalColor_w] = finalColor;
+	finalColor_w = 1.0;
+	return finalColor;
 }
 
 ArithmeticStructures::HomogenousCoordinates SceneObject::getNormalOnSphereSurfaceAt(ArithmeticStructures::HomogenousCoordinates pointOnSphereInWorldCoordinates)

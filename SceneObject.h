@@ -9,11 +9,12 @@ class SceneObject
 public:
 	//todo: outsource lightsource ?
 	struct LightSource {
-		LightSource(ArithmeticStructures::HomogenousCoordinates intensity, ArithmeticStructures::HomogenousCoordinates position) : m_intensity{ intensity }, m_position{ position } {};
-		ArithmeticStructures::HomogenousCoordinates getIntensity() { return m_intensity; };
+		LightSource(ArithmeticStructures::HomogenousCoordinates color, ArithmeticStructures::HomogenousCoordinates position) : m_color{ color }, m_position{ position } {};
+		ArithmeticStructures::HomogenousCoordinates getColor() { return m_color; }; //todo: add a variable that accounts explicitly for the intensity of the lightsource
 		ArithmeticStructures::HomogenousCoordinates getPosition() { return m_position; };
+		void setPosition(ArithmeticStructures::HomogenousCoordinates position) { m_position = position; };
 	private:
-		ArithmeticStructures::HomogenousCoordinates m_intensity;
+		ArithmeticStructures::HomogenousCoordinates m_color;
 		ArithmeticStructures::HomogenousCoordinates m_position;
 	};
 
