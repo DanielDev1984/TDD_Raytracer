@@ -6,6 +6,7 @@ public:
 	void calculateAndDrawProjectilePathway();
 	void calculateAndDrawClock();
 	void drawSphereWithBasicShading(); // the closer the sphere is to the rays origin, the brighter the color
+	void drawSphereWithPhongShading();
 private:
 	void updateProgressBar(int progressPercentage);
 	void initProgressBar() { std::cout << "Progress [%] : "; m_progress = 0; };
