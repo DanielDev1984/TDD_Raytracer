@@ -12,6 +12,7 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     QGraphicsScene* scene = new QGraphicsScene();
     ui.graphicsView->setScene(scene);
     QImage* image = new QImage();
+    // todo: use the filename of the relevant ppm / image
     image->load("X_512Y_256Z_-64.ppm");
     QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(*image));
     scene->addItem(item);

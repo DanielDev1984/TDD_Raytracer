@@ -23,7 +23,9 @@ int main(int argc, char* argv[])
 	//raytracer.calculateAndDrawProjectilePathway();
 	//raytracer.calculateAndDrawClock();
 	//raytracer.drawSphereWithBasicShading();
-	//raytracer.drawSphereWithPhongShading();
+	// 
+	// todo: make sure an update of the GraphicsView is triggered when the rendering is done
+	raytracer.drawSphereWithPhongShading();
 	return a.exec();
 
 }   
@@ -301,7 +303,7 @@ void TDD_Raytracer::drawSphereWithPhongShading()
 	std::cout << "\nend raytracing, write ppm";
 	imageWriter.createPPM(referenceCanvas);
 }
-
+//todo: update progressbar on qt-GUI (instead of console!)
 void TDD_Raytracer::updateProgressBar(int progressPercentage)
 {
 	if (!m_progressBarInitialized)
