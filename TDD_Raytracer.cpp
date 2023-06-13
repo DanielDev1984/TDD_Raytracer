@@ -9,15 +9,22 @@
 #include "Canvas.h"
 #include "GeometricStructures.h"
 #include "SceneObject.h"
+#include "QtWidget_VtkSandbox.h"
+#include <QtWidgets/QApplication>
 
-int main()
+int main(int argc, char* argv[])
 {
+	QApplication a(argc, argv);
+	QtWidget_VtkSandbox w;
+	w.show();
+
+	
 	TDD_Raytracer raytracer{};
 	//raytracer.calculateAndDrawProjectilePathway();
 	//raytracer.calculateAndDrawClock();
 	//raytracer.drawSphereWithBasicShading();
-	raytracer.drawSphereWithPhongShading();
-	
+	//raytracer.drawSphereWithPhongShading();
+	return a.exec();
 
 }   
 
@@ -201,7 +208,7 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 void TDD_Raytracer::drawSphereWithPhongShading()
 {
 	Canvas referenceCanvas(256, 256);
-	constexpr float light_x{ 128.0 }, light_y{ 128.0 }, light_z{ 128.0 };
+	constexpr float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
 	std::string filename{};
 	filename += "X_" + std::to_string((int)light_x) + "Y_" + std::to_string((int)light_y) + "Z_" + std::to_string((int)light_z)+".ppm";
 	//PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWithPhongShading.ppm" };
@@ -211,14 +218,14 @@ void TDD_Raytracer::drawSphereWithPhongShading()
 	constexpr int sphere_Radius{ 1 };
 	GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 	SceneObject sO{ sphere };
-	const float uniformSphereScale{ referenceCanvas.getDimX() / 2.0f };
+	const float uniformSphereScale{ float(referenceCanvas.getDimX()*0.5) };
 	const float scale_x{ uniformSphereScale }, scale_y{ uniformSphereScale }, scale_z{ uniformSphereScale };
-	const float shift_x{ 1.0f }, shift_y{1.0f }, shift_z{ 0.0 }; //todo: why is 1.0 enough to move the sphere to the center???
+	const float shift_x{ 1.0f }, shift_y{0.0f }, shift_z{1.0f }; //todo: why is 1.0 enough to move the sphere to the center???
 	sO.setSphereScaling(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
 	sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
 
-	constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.3 }, shininessFactor{ 200.0 };
-	constexpr ArithmeticStructures::HomogenousCoordinates color{ 0.6,0.0,0.7,1.0 };
+	constexpr float ambientFactor{ 0.3 }, diffuseFactor{ 0.9 }, specularFactor{ 0.0 }, shininessFactor{ 0.0 };
+	constexpr ArithmeticStructures::HomogenousCoordinates color{ 0.0,0.7,0.1,1.0 };
 	Material m{ ambientFactor, diffuseFactor, specularFactor, shininessFactor,color };
 	sO.setSphereMaterial(m);
 
@@ -248,18 +255,43 @@ void TDD_Raytracer::drawSphereWithPhongShading()
 			{
 				auto hitPointCoordinates{ ArithmeticStructures::HomogenousCoordinates{x,y,actualHit,1.0} };
 				
+				
+
 				auto surfaceNormalAtHitPoint{sO.getNormalOnSphereSurfaceAt(hitPointCoordinates)};
-				auto eyeVector{ ArithmeticStructures::subtractCoordinates(hitPointCoordinates, ArithmeticStructures::HomogenousCoordinates(x,y,0.0,1.0)) };
+				auto eyeVector{ ArithmeticStructures::subtractCoordinates(hitPointCoordinates, ray.getOrigin()) };
 				auto [a, b, c, d] = eyeVector;
 				ArithmeticStructures aS_local{};
 				aS_local.setVector(a, b, c);
 				eyeVector = aS_local.getNormalizedVector();
 				auto colorAtHitPoint{ sO.getPhongShadedSurfaceColor(m, lS, hitPointCoordinates, surfaceNormalAtHitPoint,eyeVector ) };
 				referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(colorAtHitPoint, 255.0));
+				//referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(ArithmeticStructures::HomogenousCoordinates{ (int)(0.0),255-(int)(actualHit),(int)(0.0),1.0 }, 1.0));
 			}
-			else
+			else // draw background
 			{
-				referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(255.0),(int)(0.0),(int)(0.0),1.0 });
+				// todo: instead of trying to colorize the background, calculate a 2d vectorfield for every "pixel" on the imageplane, representing the direction of the lightsource. out of this an overlay could be calculated thar represents the lightsource as e.g. "arrows" or similar
+				// 
+				// 
+				// 
+				// the lightsource is visualized as a unidirectional (point)lightsource with decreasing luminance wrt 
+				//const auto luminance{ (int)(255.0 * (x * 100.0 / 255.0) * 0.01) };
+				ArithmeticStructures::HomogenousCoordinates lightOrigin{ light_x,light_y, 0.0, 1.0 };
+				ArithmeticStructures::HomogenousCoordinates pointOnImageplane{ x,y, 0.0, 1.0 };
+				auto vectorLightSourceToImagePoint{ ArithmeticStructures::subtractCoordinates(pointOnImageplane, lightOrigin) };
+				ArithmeticStructures aS{};
+				const auto& [x_local, y_local, z_local, w] = vectorLightSourceToImagePoint;
+				aS.setVector(x_local,y_local,z_local);
+
+				//auto luminance{ 600.0 - sqrt(pow(x_local, 2.0) + (y_local, 2.0)) };
+
+				//todo: find a proper, dynamic value, that allows for a smooth, radial, gradient of the lightsource
+				auto luminance{700.0 - (aS.magnitude())};
+				luminance < 0 || luminance > 255 ? 
+					referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ 255,0,0,1.0 }) : 
+					referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
+				//referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
+				//const auto luminance{ 143.0 };
+				//referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
 			}
 			// convenience function for debug / progress output
 			progress = int((x * referenceCanvas.getDimY() + y) * 100 / imageSize);

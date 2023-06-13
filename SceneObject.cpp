@@ -106,6 +106,10 @@ ArithmeticStructures::HomogenousCoordinates SceneObject::getPhongShadedSurfaceCo
 			specularColor = ArithmeticStructures::multiplyWithScalar(l.getColor(), finalSpecularFactor);
 		}
 	}
+	/*else
+	{
+		diffuseColor = ArithmeticStructures::HomogenousCoordinates{ 1.0,0.0,0.0,1.0 };
+	}*/
 	// final Phong shaded color = ambient + diffuse + specular color
 	
 	auto finalColor{ ArithmeticStructures::addCoordinates(ArithmeticStructures::addCoordinates(ambientColor, diffuseColor), specularColor) };

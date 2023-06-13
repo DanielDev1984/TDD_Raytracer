@@ -20,10 +20,11 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <Keyword>Win32Proj</Keyword>
+    <Keyword>QtVS_v304</Keyword>
     <ProjectGuid>{e5d04344-322b-45af-abd7-35dfc60f8501}</ProjectGuid>
     <RootNamespace>TDDRaytracer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
     <ProjectName>TDD_Raytracer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -46,6 +47,16 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtInstall>msvc2019_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>msvc2019_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -54,6 +65,9 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -85,6 +99,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <QtInstall>msvc2019_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtDeploy>false</QtDeploy>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -97,6 +116,48 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <QtMoc>
+      <ExecutionDescription>moc %(Identity)</ExecutionDescription>
+    </QtMoc>
+    <QtMoc>
+      <QtMocDir>$(IntDir)moc\</QtMocDir>
+    </QtMoc>
+    <QtMoc>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtMoc>
+      <DynamicSource>output</DynamicSource>
+    </QtMoc>
+    <QtMoc>
+      <ParallelProcess>true</ParallelProcess>
+    </QtMoc>
+    <QtRcc>
+      <ExecutionDescription>rcc %(Identity)</ExecutionDescription>
+    </QtRcc>
+    <QtRcc>
+      <QtRccDir>$(IntDir)rcc\</QtRccDir>
+    </QtRcc>
+    <QtRcc>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
+    <QtRcc>
+      <InitFuncName>%(Filename)</InitFuncName>
+    </QtRcc>
+    <QtRcc>
+      <Compression>default</Compression>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>uic %(Identity)</ExecutionDescription>
+    </QtUic>
+    <QtUic>
+      <QtUicDir>$(IntDir)uic\</QtUicDir>
+    </QtUic>
+    <QtUic>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+    <QtUic>
+      <ParallelProcess>true</ParallelProcess>
+    </QtUic>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -121,6 +182,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,7 +206,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ArithmeticStructures.cpp" />
+    <QtRcc Include="QtWidget_VtkSandbox.qrc" />
+    <QtUic Include="QtWidget_VtkSandbox.ui" />
+    <QtMoc Include="QtWidget_VtkSandbox.h" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="GeometricStructures.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -152,6 +216,7 @@
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="TDD_Raytracer.cpp" />
+    <ClCompile Include="QtWidget_VtkSandbox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArithmeticStructures.h" />
@@ -164,6 +229,9 @@
     <ClInclude Include="TDD_Raytracer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
