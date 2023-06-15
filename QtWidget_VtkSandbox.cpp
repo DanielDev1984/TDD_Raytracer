@@ -5,6 +5,7 @@
 #include <QImage>
 
 #include <vtkSphereSource.h>
+#include <vtkArrowSource.h>
 #include <vtkActor.h>
 #include <vtkImageActor.h>
 #include <vtkPolyDataMapper.h>
@@ -12,6 +13,12 @@
 #include <vtkImageCanvasSource2D.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
+#include <vtkPointData.h>
+#include <vtkGlyph2D.h>
+#include <vtkImageSliceMapper.h>
+#include <vtkImageSlice.h>
+#include <vtkNamedColors.h>
+#include <vtkProperty.h>
 
 #include "TDD_Raytracer.h"
 
@@ -61,6 +68,8 @@ void QtWidget_VtkSandbox::onLightPosXChanged()
 
 void QtWidget_VtkSandbox::onRenderButtonClicked()
 {
+    // sphere
+    /////////////////////
     vtkSmartPointer<vtkSphereSource> sphereSource{ vtkSmartPointer<vtkSphereSource>::New() };
     sphereSource->SetRadius(2);
     sphereSource->Update();
@@ -68,8 +77,12 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     sphereMapper->SetInputData(sphereSource->GetOutput());
     vtkSmartPointer<vtkActor> sphere{ vtkSmartPointer<vtkActor>::New() };
     sphere->SetMapper(sphereMapper);
+    /////////////////////
+
+    
 
     // setting up the background actor
+    /////////////////////
     vtkSmartPointer<vtkJPEGReader> jpegReader{ vtkSmartPointer<vtkJPEGReader>::New() };
     const auto fN{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\X_512Y_256Z_-64.jpg" };
     jpegReader->CanReadFile(fN);
@@ -81,10 +94,102 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     bg_Image->SetInputData(imageData);
     m_Renderer_bG->AddViewProp(bg_Image);
     m_Renderer_bG->ResetCamera();
+    /////////////////////
+
+    // arrow / arrow field
+    /////////////////////
+    vtkSmartPointer<vtkArrowSource> arrowSource{ vtkSmartPointer<vtkArrowSource>::New() };
+    arrowSource->Update();
+    /*vtkSmartPointer<vtkPolyDataMapper> arrowMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
+    arrowMapper->SetInputData(arrowSource->GetOutput());
+    vtkSmartPointer<vtkActor> arrow{ vtkSmartPointer<vtkActor>::New() };
+    arrow->SetMapper(arrowMapper);*/
+
+    vtkSmartPointer<vtkImageData> imageDataVectorField{ vtkSmartPointer<vtkImageData>::New() };
+    //imageDataVectorField->SetDimensions(imageData->GetDimensions());
+    //imageDataVectorField->SetDimensions(481,321,1);
+    // the aspect ratio of the openGWindow
+    auto const aspectRatio{ 418.0 / 321.0 };
+    //todo: what do these vecFieldDimensions actually mean wrt the background image
+    //->arrows get smaller when vecFieldDims increase
+    const double vectFieldDim_X{ 40.0 }; 
+    imageDataVectorField->SetDimensions(vectFieldDim_X, vectFieldDim_X / aspectRatio, 1);
+    imageDataVectorField->AllocateScalars(VTK_FLOAT, 3);
+
+    int* dims = imageDataVectorField->GetDimensions();
+    // Zero the image
+    bool flip{ true };
+    for (auto z = 0; z < dims[2]; ++z)
+    {
+        for (auto y = 0; y < dims[1]; ++y)
+        {
+            for (auto x = 0; x < dims[0]; ++x)
+            {
+                //todo: instead of doing this manually, filter the (dense) vectorfield lateron
+                if ((x % 10 == 0) && (y % 10 == 0))
+                {
+                    auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
+                    pixel[0] = 10;
+                    pixel[1] = flip == true ? 5 : - 5;
+                    pixel[2] = 0.0;
+                    flip = !flip;
+                }
+                else
+                {
+                    auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
+                    pixel[0] = 0.0;
+                    pixel[1] = 0.0;
+                    pixel[2] = 0.0;
+                }
+            }
+        }
+    }
+
+   /* {
+        auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(20, 20, 0));
+        pixel[0] = 10;
+        pixel[1] = 5;
+    }
+    {
+        auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(40, 40, 0));
+        pixel[0] = -10;
+        pixel[1] = 5;
+    }*/
+
+    //todo: what does this do?
+    imageDataVectorField->GetPointData()->SetActiveVectors(imageDataVectorField->GetPointData()->GetScalars()->GetName()); 
+    vtkSmartPointer<vtkGlyph2D> glyphFilter{ vtkSmartPointer<vtkGlyph2D>::New() };
+    glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
+    glyphFilter->OrientOn();
+    glyphFilter->SetVectorModeToUseVector();
+    glyphFilter->SetInputData(imageDataVectorField);
+    glyphFilter->Update();
+
+    vtkSmartPointer<vtkImageSliceMapper> imageMapper{ vtkSmartPointer<vtkImageSliceMapper>::New() };
+    imageMapper->SetInputData(imageDataVectorField);
+
+    vtkSmartPointer<vtkImageSlice> imageSlice{ vtkSmartPointer<vtkImageSlice>::New() };
+    imageSlice->SetMapper(imageMapper);
+
+    vtkSmartPointer<vtkPolyDataMapper> vectorMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
+    vectorMapper->SetInputConnection(glyphFilter->GetOutputPort());
+
+    vtkSmartPointer<vtkActor> vectorActor{ vtkSmartPointer<vtkActor>::New() };
+    vtkNew<vtkNamedColors> colors;
+   
+    vectorActor->SetMapper(vectorMapper);
+    //todo: why is it not possible to color the glyphs?
+    vectorActor->GetProperty()->SetDiffuseColor(
+        colors->GetColor3d("LimeGreen").GetData());
+    /////////////////////
 
     // setting up the "rest" of the scene
 
-    m_Renderer_fG->AddViewProp(sphere);
+    //m_Renderer_fG->AddViewProp(arrow);
+    // todo: what is the image slice used for? it creates a black background when being added to the renderer!
+    // could the imageSlice be used to hold the actual "backgroundimage"?
+    //m_Renderer_fG->AddViewProp(imageSlice);
+    m_Renderer_fG->AddViewProp(vectorActor);
     m_Renderer_fG->ResetCamera();
     m_RenderWindow->Render();
 
