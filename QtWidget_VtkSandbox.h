@@ -3,6 +3,11 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_QtWidget_VtkSandbox.h"
 
+#include <vtkGenericOpenGLRenderWindow.h>
+#include <vtkRenderer.h>
+#include <QVTKInteractor.h>
+#include <vtkInteractorStyle.h>
+
 class QtWidget_VtkSandbox : public QMainWindow
 {
     Q_OBJECT
@@ -18,4 +23,10 @@ public slots:
     void onLightPosXChanged();
 private:
     Ui::QtWidget_VtkSandboxClass ui;
+
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_RenderWindow;
+    vtkSmartPointer<vtkRenderer> m_Renderer_fG;
+    vtkSmartPointer<vtkRenderer> m_Renderer_bG;
+    vtkSmartPointer<QVTKInteractor> m_Interactor;
+    vtkSmartPointer<vtkInteractorStyle> m_InteractorStyle;
 };
