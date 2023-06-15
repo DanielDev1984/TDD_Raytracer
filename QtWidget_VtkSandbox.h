@@ -12,6 +12,10 @@ public:
     ~QtWidget_VtkSandbox();
 
     QLabel* label;
+
+public slots:
+    void onRenderButtonClicked();
+    void onLightPosXChanged();
 private:
     Ui::QtWidget_VtkSandboxClass ui;
 };

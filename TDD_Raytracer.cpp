@@ -1,7 +1,7 @@
 // TDD_Raytracer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
+//#include <iostream>
 #include <string>
 #include "TDD_Raytracer.h"
 #include "ArithmeticStructures.h"
@@ -17,17 +17,7 @@ int main(int argc, char* argv[])
 	QApplication a(argc, argv);
 	QtWidget_VtkSandbox w;
 	w.show();
-
-	
-	TDD_Raytracer raytracer{};
-	//raytracer.calculateAndDrawProjectilePathway();
-	//raytracer.calculateAndDrawClock();
-	//raytracer.drawSphereWithBasicShading();
-	// 
-	// todo: make sure an update of the GraphicsView is triggered when the rendering is done
-	raytracer.drawSphereWithPhongShading();
 	return a.exec();
-
 }   
 
 void TDD_Raytracer::calculateAndDrawProjectilePathway()
@@ -207,10 +197,11 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	imageWriter.createPPM(referenceCanvas);
 }
 
-void TDD_Raytracer::drawSphereWithPhongShading()
+void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z)
 {
 	Canvas referenceCanvas(256, 256);
-	constexpr float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+	//const float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+	const float light_x{ lightPos_x }, light_y{ lightPos_y }, light_z{ lightPos_z };
 	std::string filename{};
 	filename += "X_" + std::to_string((int)light_x) + "Y_" + std::to_string((int)light_y) + "Z_" + std::to_string((int)light_z)+".ppm";
 	//PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWithPhongShading.ppm" };

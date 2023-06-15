@@ -27,7 +27,7 @@
      <string>Render !</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="cameraPos_X">
+   <widget class="QLineEdit" name="lightPos_X">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -47,7 +47,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>cameraPos_Y</string>
+     <string>lightPos_Y</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -60,10 +60,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>cameraPos_Z</string>
+     <string>lightPos_Z</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="cameraPos_Y">
+   <widget class="QLineEdit" name="lightPos_Y">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -73,7 +73,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="cameraPos_Z">
+   <widget class="QLineEdit" name="lightPos_Z">
     <property name="geometry">
      <rect>
       <x>300</x>
@@ -116,7 +116,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>cameraPos_X</string>
+     <string>lightPos_X</string>
     </property>
    </widget>
   </widget>
