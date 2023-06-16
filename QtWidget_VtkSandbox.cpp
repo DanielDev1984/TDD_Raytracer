@@ -68,24 +68,16 @@ void QtWidget_VtkSandbox::onLightPosXChanged()
 
 void QtWidget_VtkSandbox::onRenderButtonClicked()
 {
-    // sphere
-    /////////////////////
-    vtkSmartPointer<vtkSphereSource> sphereSource{ vtkSmartPointer<vtkSphereSource>::New() };
-    sphereSource->SetRadius(2);
-    sphereSource->Update();
-    vtkSmartPointer<vtkPolyDataMapper> sphereMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
-    sphereMapper->SetInputData(sphereSource->GetOutput());
-    vtkSmartPointer<vtkActor> sphere{ vtkSmartPointer<vtkActor>::New() };
-    sphere->SetMapper(sphereMapper);
-    /////////////////////
-
-    
-
     // setting up the background actor
     /////////////////////
     vtkSmartPointer<vtkJPEGReader> jpegReader{ vtkSmartPointer<vtkJPEGReader>::New() };
-    const auto fN{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\X_512Y_256Z_-64.jpg" };
-    jpegReader->CanReadFile(fN);
+    //todo: output of the raytracer currently is ppm -> how to convert to jpeg? / make it readable from vtk?
+    const auto fN{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\bgImage.jpg" };
+    //todo: figure out how to use vtkOutpuWindow for managing the application output
+    std::cout << "input filename: " << fN << "\n";
+    //todo: would imageprovider be the correct "imagesource"?
+    auto const fileReadSucces{ (jpegReader->CanReadFile(fN) > 0) ? "jpeg file could be read" : "jpeg file could not be read" };
+    std::cout << fileReadSucces << "\n";
 
     jpegReader->SetFileName(fN);
     jpegReader->Update();
@@ -99,6 +91,7 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     // arrow / arrow field
     /////////////////////
     vtkSmartPointer<vtkArrowSource> arrowSource{ vtkSmartPointer<vtkArrowSource>::New() };
+    arrowSource->InvertOn();
     arrowSource->Update();
     /*vtkSmartPointer<vtkPolyDataMapper> arrowMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
     arrowMapper->SetInputData(arrowSource->GetOutput());
@@ -113,7 +106,8 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //todo: what do these vecFieldDimensions actually mean wrt the background image
     //->arrows get smaller when vecFieldDims increase
     const double vectFieldDim_X{ 40.0 }; 
-    imageDataVectorField->SetDimensions(vectFieldDim_X, vectFieldDim_X / aspectRatio, 1);
+    //imageDataVectorField->SetDimensions(vectFieldDim_X, vectFieldDim_X / aspectRatio, 1);
+    imageDataVectorField->SetDimensions(imageData->GetDimensions());
     imageDataVectorField->AllocateScalars(VTK_FLOAT, 3);
 
     int* dims = imageDataVectorField->GetDimensions();
@@ -126,12 +120,16 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
             for (auto x = 0; x < dims[0]; ++x)
             {
                 //todo: instead of doing this manually, filter the (dense) vectorfield lateron
-                if ((x % 10 == 0) && (y % 10 == 0))
+                if (((x % 20 == 0) && (y % 20 == 0)))
                 {
                     auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
-                    pixel[0] = 10;
-                    pixel[1] = flip == true ? 5 : - 5;
-                    pixel[2] = 0.0;
+                    //todo sth is not yet correct wrt to calculating the vector to/from the lightsource
+                    double xcomponent = x - 256.0;
+                    double yComponent = y;
+                    double vectLenght{ std::sqrt(xcomponent * xcomponent + yComponent * yComponent) };
+                    pixel[0] = xcomponent / vectLenght * 30;//10;
+                    pixel[1] = yComponent / vectLenght * 30;//flip == true ? 5 : - 5;
+                    pixel[2] = 0;//todo: dont forget to take z component into account. somehow this seems to be ignored for the rendering of the arrows atm :(
                     flip = !flip;
                 }
                 else
@@ -145,23 +143,13 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
         }
     }
 
-   /* {
-        auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(20, 20, 0));
-        pixel[0] = 10;
-        pixel[1] = 5;
-    }
-    {
-        auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(40, 40, 0));
-        pixel[0] = -10;
-        pixel[1] = 5;
-    }*/
 
     //todo: what does this do?
     imageDataVectorField->GetPointData()->SetActiveVectors(imageDataVectorField->GetPointData()->GetScalars()->GetName()); 
     vtkSmartPointer<vtkGlyph2D> glyphFilter{ vtkSmartPointer<vtkGlyph2D>::New() };
     glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
     glyphFilter->OrientOn();
-    glyphFilter->SetVectorModeToUseVector();
+    //glyphFilter->SetVectorModeToUseVector();
     glyphFilter->SetInputData(imageDataVectorField);
     glyphFilter->Update();
 
@@ -172,6 +160,7 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     imageSlice->SetMapper(imageMapper);
 
     vtkSmartPointer<vtkPolyDataMapper> vectorMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
+    vectorMapper->ScalarVisibilityOff();
     vectorMapper->SetInputConnection(glyphFilter->GetOutputPort());
 
     vtkSmartPointer<vtkActor> vectorActor{ vtkSmartPointer<vtkActor>::New() };
@@ -179,8 +168,9 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
    
     vectorActor->SetMapper(vectorMapper);
     //todo: why is it not possible to color the glyphs?
-    vectorActor->GetProperty()->SetDiffuseColor(
-        colors->GetColor3d("LimeGreen").GetData());
+    auto constexpr glyphColor{ "White" };//"LimeGreen"
+    vectorActor->GetProperty()->SetColor(
+        colors->GetColor3d(glyphColor).GetData());
     /////////////////////
 
     // setting up the "rest" of the scene
@@ -206,10 +196,12 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
 
     auto yd{ (extent[3] - extent[2] + 1) * spacing[1] };
     auto d{ camera->GetDistance() };
-    camera->SetParallelScale(0.5 * yd);
+    //this sets the background camera to cover all of the available openglwindow(space)
+    /*camera->SetParallelScale(0.5 * yd);
     camera->SetFocalPoint(xc, yc, 0.0);
-    camera->SetPosition(xc, yc, d);
+    camera->SetPosition(xc, yc, d);*/
 
+    
     m_RenderWindow->Render();
 
 

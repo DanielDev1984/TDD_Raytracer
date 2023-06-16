@@ -259,8 +259,8 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 				auto colorAtHitPoint{ sO.getPhongShadedSurfaceColor(m, lS, hitPointCoordinates, surfaceNormalAtHitPoint,eyeVector ) };
 				referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(colorAtHitPoint, 255.0));
 				//referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(ArithmeticStructures::HomogenousCoordinates{ (int)(0.0),255-(int)(actualHit),(int)(0.0),1.0 }, 1.0));
-			}
-			else // draw background
+			}//todo: enable this branch again to calculate light direction / vector field lateron
+			else if(false)// draw background
 			{
 				// todo: instead of trying to colorize the background, calculate a 2d vectorfield for every "pixel" on the imageplane, representing the direction of the lightsource. out of this an overlay could be calculated thar represents the lightsource as e.g. "arrows" or similar
 				// 
