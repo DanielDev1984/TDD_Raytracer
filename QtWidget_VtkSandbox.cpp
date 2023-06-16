@@ -107,30 +107,37 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //->arrows get smaller when vecFieldDims increase
     const double vectFieldDim_X{ 40.0 }; 
     //imageDataVectorField->SetDimensions(vectFieldDim_X, vectFieldDim_X / aspectRatio, 1);
-    imageDataVectorField->SetDimensions(imageData->GetDimensions());
+    const auto imageDimensions{ imageData->GetDimensions() };
+    std::cout << "imageDimensionsX: " << imageDimensions[0] << "\n";
+    std::cout << "imageDimensionsY: " << imageDimensions[1] << "\n";
+    std::cout << "imageDimensionsZ: " << imageDimensions[2] << "\n";
+    imageDataVectorField->SetDimensions(imageDimensions);
     imageDataVectorField->AllocateScalars(VTK_FLOAT, 3);
 
-    int* dims = imageDataVectorField->GetDimensions();
-    // Zero the image
-    bool flip{ true };
-    for (auto z = 0; z < dims[2]; ++z)
+    const auto vectorFieldDimensions{ imageDataVectorField->GetDimensions() };
+    constexpr auto samplingRateX{ 20 };
+    constexpr auto samplingRateY{ 20 };
+    constexpr auto arrowLengthScalingFactor{ 25 };
+    // fill the vectorfield
+    for (auto z = 0; z < vectorFieldDimensions[2]; ++z)
     {
-        for (auto y = 0; y < dims[1]; ++y)
+        for (auto y = 0; y < vectorFieldDimensions[1]; ++y)
         {
-            for (auto x = 0; x < dims[0]; ++x)
+            for (auto x = 0; x < vectorFieldDimensions[0]; ++x)
             {
                 //todo: instead of doing this manually, filter the (dense) vectorfield lateron
-                if (((x % 20 == 0) && (y % 20 == 0)))
+                if (((x % samplingRateX == 0) && (y % samplingRateY == 0)))
                 {
                     auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
                     //todo sth is not yet correct wrt to calculating the vector to/from the lightsource
-                    double xcomponent = x - 256.0;
-                    double yComponent = y;
+                    double xcomponent = x - 512.0;
+                    double yComponent = y + 256;
+                    //todo: do these vectors (in the final vectorfield) really have to be normalized "manually" at this point?
                     double vectLenght{ std::sqrt(xcomponent * xcomponent + yComponent * yComponent) };
-                    pixel[0] = xcomponent / vectLenght * 30;//10;
-                    pixel[1] = yComponent / vectLenght * 30;//flip == true ? 5 : - 5;
+                    pixel[0] = xcomponent / vectLenght * arrowLengthScalingFactor;
+                    pixel[1] = yComponent / vectLenght * arrowLengthScalingFactor;
                     pixel[2] = 0;//todo: dont forget to take z component into account. somehow this seems to be ignored for the rendering of the arrows atm :(
-                    flip = !flip;
+                    
                 }
                 else
                 {
@@ -183,23 +190,44 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     m_Renderer_fG->ResetCamera();
     m_RenderWindow->Render();
 
-    // setup bg camera to fill the renderer with the image
-    auto origin{ imageData->GetOrigin() };
-    auto spacing{ imageData->GetSpacing() };
-    auto extent{ imageData->GetExtent() };
 
-    auto camera{ m_Renderer_bG->GetActiveCamera() };
-    camera->ParallelProjectionOn();
+    auto origin_bG{ imageData->GetOrigin() };
+    auto spacing_bG{ imageData->GetSpacing() };
+    auto extent_bG{ imageData->GetExtent() };
 
-    auto xc{ origin[0] + 0.5 * (extent[0] + extent[1]) * spacing[0] };
-    auto yc{ origin[1] + 0.5 * (extent[2] + extent[3]) * spacing[1] };
+    //auto camera{ m_Renderer_bG->GetActiveCamera() };
+    auto camera_bG{ m_Renderer_bG->GetActiveCamera() };
+    camera_bG->ParallelProjectionOn();
 
-    auto yd{ (extent[3] - extent[2] + 1) * spacing[1] };
-    auto d{ camera->GetDistance() };
+    auto xc_bG{ origin_bG[0] + 0.5 * (extent_bG[0] + extent_bG[1]) * spacing_bG[0] };
+    auto yc_bG{ origin_bG[1] + 0.5 * (extent_bG[2] + extent_bG[3]) * spacing_bG[1] };
+
+    auto yd_bG{ (extent_bG[3] - extent_bG[2] + 1) * spacing_bG[1] };
+    auto d_bG{ camera_bG->GetDistance() };
     //this sets the background camera to cover all of the available openglwindow(space)
-    /*camera->SetParallelScale(0.5 * yd);
-    camera->SetFocalPoint(xc, yc, 0.0);
-    camera->SetPosition(xc, yc, d);*/
+    camera_bG->SetParallelScale(0.5 * yd_bG);
+    camera_bG->SetFocalPoint(xc_bG, yc_bG, 0.0);
+    camera_bG->SetPosition(xc_bG, yc_bG, d_bG);
+
+
+    // setup bg camera to fill the renderer with the image
+    auto origin_fG{ imageDataVectorField->GetOrigin() };
+    auto spacing_fG{ imageDataVectorField->GetSpacing() };
+    auto extent_fG{ imageDataVectorField->GetExtent() };
+
+    //auto camera{ m_Renderer_bG->GetActiveCamera() };
+    auto camera_fG{ m_Renderer_fG->GetActiveCamera() };
+    camera_fG->ParallelProjectionOn();
+
+    auto xc_fG{ origin_fG[0] + 0.5 * (extent_fG[0] + extent_fG[1]) * spacing_fG[0] };
+    auto yc_fG{ origin_fG[1] + 0.5 * (extent_fG[2] + extent_fG[3]) * spacing_fG[1] };
+
+    auto yd_fG{ (extent_fG[3] - extent_fG[2] + 1) * spacing_fG[1] };
+    auto d_fG{ camera_fG->GetDistance() };
+    //this sets the background camera to cover all of the available openglwindow(space)
+    camera_fG->SetParallelScale(0.5 * yd_fG);
+    camera_fG->SetFocalPoint(xc_fG, yc_fG, 0.0);
+    camera_fG->SetPosition(xc_fG, yc_fG, d_fG);
 
     
     m_RenderWindow->Render();
