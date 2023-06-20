@@ -8,7 +8,7 @@ PPMWriter::PPMWriter(int dimX, int dimY, std::string filename) :
 void PPMWriter::createPPM(Canvas& c) {
     {
         std::ofstream ostrm(m_filename, std::ios::binary);
-        ostrm << "P3" << "\n" << m_dimX << ' ' << m_dimY << "\n" << 255 << "\n";
+        ostrm << "P3" << "\n" << m_dimX << ' ' << m_dimY << "\n" << 255 << "\n";//todo: how to write binary, i.e. "P6" ppms? vtkPNMReader only allows for reading binary ppms :(
         for (auto y = 0; y < c.getDimY(); y++)
         {
             for (auto x = 0; x < c.getDimX(); x++)

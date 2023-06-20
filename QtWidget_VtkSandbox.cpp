@@ -9,7 +9,7 @@
 #include <vtkActor.h>
 #include <vtkImageActor.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkJPEGReader.h>
+#include <vtkPNMReader.h>
 #include <vtkImageCanvasSource2D.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
@@ -19,6 +19,8 @@
 #include <vtkImageSlice.h>
 #include <vtkNamedColors.h>
 #include <vtkProperty.h>
+#include <vtkMaskPoints.h>
+
 
 #include "TDD_Raytracer.h"
 
@@ -35,9 +37,6 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     QGraphicsScene* scene = new QGraphicsScene();
     ui.graphicsView->setScene(scene);
     QImage* image = new QImage();
-    // todo: use the filename of the relevant ppm / image
-    // wait for the rendering to finish before trying to load the image
-    //image->load("X_512Y_256Z_-64.ppm");
     QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(*image));
     scene->addItem(item);
     ui.graphicsView->show();
@@ -68,134 +67,125 @@ void QtWidget_VtkSandbox::onLightPosXChanged()
 
 void QtWidget_VtkSandbox::onRenderButtonClicked()
 {
-    // setting up the background actor
-    /////////////////////
-    vtkSmartPointer<vtkJPEGReader> jpegReader{ vtkSmartPointer<vtkJPEGReader>::New() };
-    //todo: output of the raytracer currently is ppm -> how to convert to jpeg? / make it readable from vtk?
-    const auto fN{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\bgImage.jpg" };
-    //todo: figure out how to use vtkOutpuWindow for managing the application output
-    std::cout << "input filename: " << fN << "\n";
-    //todo: would imageprovider be the correct "imagesource"?
-    auto const fileReadSucces{ (jpegReader->CanReadFile(fN) > 0) ? "jpeg file could be read" : "jpeg file could not be read" };
-    std::cout << fileReadSucces << "\n";
+    //todo: would(nt) it be better to have this as a static function? -> think of a nicer way to actually trigger the rendering
+    TDD_Raytracer raytracer{};
+    //todo: use the values from the UI instead of hardcoded values!
+    constexpr float light_x{ 512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false);
 
-    jpegReader->SetFileName(fN);
-    jpegReader->Update();
-    auto imageData{ jpegReader->GetOutput() };
-    vtkSmartPointer<vtkImageActor> bg_Image{ vtkSmartPointer<vtkImageActor>::New() };
-    bg_Image->SetInputData(imageData);
-    m_Renderer_bG->AddViewProp(bg_Image);
+    // read input data
+    //todo: outsource this to own function
+    vtkSmartPointer<vtkPNMReader> imageReader_bG{ vtkSmartPointer<vtkPNMReader>::New() };
+    vtkSmartPointer<vtkPNMReader> imageReader_fG{ vtkSmartPointer<vtkPNMReader>::New() };
+    // for some reason, the input data range seems to be restricted to maxVal 128 (?)
+    // the input data needs to be a binary (i.e. P6) ppm
+    constexpr auto fN_bG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\renderedImage_P6.ppm" };
+    constexpr auto fN_fG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\vectorfield.ppm" };
+    
+    //todo: figure out how to use vtkOutpuWindow for managing the application output
+    std::cout << "input filename foreground: " << fN_bG << "\n";
+    std::cout << "input filename foreground: " << fN_fG << "\n";
+    
+    auto const fileReadSucces_fG{ (imageReader_fG->CanReadFile(fN_fG) > 0) ? "image file fG could be read" : "image file fG could not be read" };
+    std::cout << fileReadSucces_fG << "\n";
+    
+    // setup the background
+    auto const fileReadSucces_bG{ (imageReader_bG->CanReadFile(fN_bG) > 0) ? "image file bG could be read" : "image file bG could not be read" };
+    std::cout << fileReadSucces_bG << "\n";
+    imageReader_bG->SetFileName(fN_bG);
+    imageReader_bG->Update();
+    const auto imageData_bG{ imageReader_bG->GetOutput() };
+    vtkSmartPointer<vtkImageActor> actor_bG{ vtkSmartPointer<vtkImageActor>::New() };
+    actor_bG->SetInputData(imageData_bG);
+    m_Renderer_bG->AddViewProp(actor_bG);
     m_Renderer_bG->ResetCamera();
     /////////////////////
 
-    // arrow / arrow field
+    const auto imageDimensions_bG{ imageData_bG->GetDimensions() };
+    std::cout << "imageDimensions_bG_X: " << imageDimensions_bG[0] << "\n";
+    std::cout << "imageDimensions_bG_Y: " << imageDimensions_bG[1] << "\n";
+    std::cout << "imageDimensions_bG_Z: " << imageDimensions_bG[2] << "\n";
+   
+
+    // setup the "overlay" / fG
     /////////////////////
+    imageReader_fG->SetFileName(fN_fG);
+    imageReader_fG->Update();
+    auto imageData_fG{ imageReader_fG->GetOutput() };
+    
+
+    const auto imageDimensions_fG{ imageData_fG->GetDimensions() };
+    std::cout << "imageDimensions_fG_X: " << imageDimensions_fG[0] << "\n";
+    std::cout << "imageDimensions_fG_Y: " << imageDimensions_fG[1] << "\n";
+    std::cout << "imageDimensions_fG_Z: " << imageDimensions_fG[2] << "\n";
+  
+    // setup the mask used for populating the glyphfilter
+    constexpr auto samplingRate{ 700 };
+    vtkNew<vtkMaskPoints> maskPoints;
+    maskPoints->SetOnRatio(samplingRate); // keep every nth (== "samplingRate") point
+
+    
+    maskPoints->SetInputData(imageData_fG);
+    
+    
+    maskPoints->Update();
+    // update needs to be called first, otherwise data is not yet available!
+    // make sure the orientation of the input (vectorfield) is used for orienting the glyphs
+    maskPoints->GetOutput()->GetPointData()->SetActiveVectors(maskPoints->GetOutput()->GetPointData()->GetScalars()->GetName());
+    
     vtkSmartPointer<vtkArrowSource> arrowSource{ vtkSmartPointer<vtkArrowSource>::New() };
-    arrowSource->InvertOn();
+    arrowSource->InvertOff();
     arrowSource->Update();
-    /*vtkSmartPointer<vtkPolyDataMapper> arrowMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
-    arrowMapper->SetInputData(arrowSource->GetOutput());
-    vtkSmartPointer<vtkActor> arrow{ vtkSmartPointer<vtkActor>::New() };
-    arrow->SetMapper(arrowMapper);*/
+   
+    
 
-    vtkSmartPointer<vtkImageData> imageDataVectorField{ vtkSmartPointer<vtkImageData>::New() };
-    //imageDataVectorField->SetDimensions(imageData->GetDimensions());
-    //imageDataVectorField->SetDimensions(481,321,1);
-    // the aspect ratio of the openGWindow
-    auto const aspectRatio{ 418.0 / 321.0 };
-    //todo: what do these vecFieldDimensions actually mean wrt the background image
-    //->arrows get smaller when vecFieldDims increase
-    const double vectFieldDim_X{ 40.0 }; 
-    //imageDataVectorField->SetDimensions(vectFieldDim_X, vectFieldDim_X / aspectRatio, 1);
-    const auto imageDimensions{ imageData->GetDimensions() };
-    std::cout << "imageDimensionsX: " << imageDimensions[0] << "\n";
-    std::cout << "imageDimensionsY: " << imageDimensions[1] << "\n";
-    std::cout << "imageDimensionsZ: " << imageDimensions[2] << "\n";
-    imageDataVectorField->SetDimensions(imageDimensions);
-    imageDataVectorField->AllocateScalars(VTK_FLOAT, 3);
+    
 
-    const auto vectorFieldDimensions{ imageDataVectorField->GetDimensions() };
-    constexpr auto samplingRateX{ 20 };
-    constexpr auto samplingRateY{ 20 };
-    constexpr auto arrowLengthScalingFactor{ 25 };
-    // fill the vectorfield
-    for (auto z = 0; z < vectorFieldDimensions[2]; ++z)
-    {
-        for (auto y = 0; y < vectorFieldDimensions[1]; ++y)
-        {
-            for (auto x = 0; x < vectorFieldDimensions[0]; ++x)
-            {
-                //todo: instead of doing this manually, filter the (dense) vectorfield lateron
-                if (((x % samplingRateX == 0) && (y % samplingRateY == 0)))
-                {
-                    auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
-                    //todo sth is not yet correct wrt to calculating the vector to/from the lightsource
-                    double xcomponent = x - 512.0;
-                    double yComponent = y + 256;
-                    //todo: do these vectors (in the final vectorfield) really have to be normalized "manually" at this point?
-                    double vectLenght{ std::sqrt(xcomponent * xcomponent + yComponent * yComponent) };
-                    pixel[0] = xcomponent / vectLenght * arrowLengthScalingFactor;
-                    pixel[1] = yComponent / vectLenght * arrowLengthScalingFactor;
-                    pixel[2] = 0;//todo: dont forget to take z component into account. somehow this seems to be ignored for the rendering of the arrows atm :(
-                    
-                }
-                else
-                {
-                    auto pixel = static_cast<float*>(imageDataVectorField->GetScalarPointer(x, y, z));
-                    pixel[0] = 0.0;
-                    pixel[1] = 0.0;
-                    pixel[2] = 0.0;
-                }
-            }
-        }
-    }
-
-
-    //todo: what does this do?
-    imageDataVectorField->GetPointData()->SetActiveVectors(imageDataVectorField->GetPointData()->GetScalars()->GetName()); 
     vtkSmartPointer<vtkGlyph2D> glyphFilter{ vtkSmartPointer<vtkGlyph2D>::New() };
+    glyphFilter->SetInputConnection(maskPoints->GetOutputPort());
     glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
+    
+    glyphFilter->ScalingOn();
     glyphFilter->OrientOn();
-    //glyphFilter->SetVectorModeToUseVector();
-    glyphFilter->SetInputData(imageDataVectorField);
+    glyphFilter->SetScaleModeToScaleByScalar();
+    glyphFilter->SetScaleFactor(0.1); //todo: normalize the size of the arrow glyphs!
+    
     glyphFilter->Update();
 
-    vtkSmartPointer<vtkImageSliceMapper> imageMapper{ vtkSmartPointer<vtkImageSliceMapper>::New() };
-    imageMapper->SetInputData(imageDataVectorField);
-
-    vtkSmartPointer<vtkImageSlice> imageSlice{ vtkSmartPointer<vtkImageSlice>::New() };
-    imageSlice->SetMapper(imageMapper);
-
     vtkSmartPointer<vtkPolyDataMapper> vectorMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
+    // without this, trying to set the color of the arrows manually lateron isnt working (and instead a scalar value of the vector is being used)
     vectorMapper->ScalarVisibilityOff();
     vectorMapper->SetInputConnection(glyphFilter->GetOutputPort());
 
     vtkSmartPointer<vtkActor> vectorActor{ vtkSmartPointer<vtkActor>::New() };
-    vtkNew<vtkNamedColors> colors;
-   
+
     vectorActor->SetMapper(vectorMapper);
-    //todo: why is it not possible to color the glyphs?
-    auto constexpr glyphColor{ "White" };//"LimeGreen"
+    vtkNew<vtkNamedColors> colors;
+    auto constexpr glyphColor{ "White" };
     vectorActor->GetProperty()->SetColor(
         colors->GetColor3d(glyphColor).GetData());
-    /////////////////////
 
     // setting up the "rest" of the scene
 
-    //m_Renderer_fG->AddViewProp(arrow);
     // todo: what is the image slice used for? it creates a black background when being added to the renderer!
     // could the imageSlice be used to hold the actual "backgroundimage"?
     //m_Renderer_fG->AddViewProp(imageSlice);
+
+    //todo: hack for letting the manually generated vectorfield point in the correct direction (indicating from where the light is comming for rendering the sphere
+    vectorActor->SetScale(-1,1,1);
+    
     m_Renderer_fG->AddViewProp(vectorActor);
     m_Renderer_fG->ResetCamera();
     m_RenderWindow->Render();
 
 
-    auto origin_bG{ imageData->GetOrigin() };
-    auto spacing_bG{ imageData->GetSpacing() };
-    auto extent_bG{ imageData->GetExtent() };
+    //this sets the cameras to cover all of the available openglwindow(space)
+    ////////////////////////////
+    // bG
+    auto origin_bG{ imageData_bG->GetOrigin() };
+    auto spacing_bG{ imageData_bG->GetSpacing() };
+    auto extent_bG{ imageData_bG->GetExtent() };
 
-    //auto camera{ m_Renderer_bG->GetActiveCamera() };
     auto camera_bG{ m_Renderer_bG->GetActiveCamera() };
     camera_bG->ParallelProjectionOn();
 
@@ -204,38 +194,32 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
 
     auto yd_bG{ (extent_bG[3] - extent_bG[2] + 1) * spacing_bG[1] };
     auto d_bG{ camera_bG->GetDistance() };
-    //this sets the background camera to cover all of the available openglwindow(space)
+
     camera_bG->SetParallelScale(0.5 * yd_bG);
     camera_bG->SetFocalPoint(xc_bG, yc_bG, 0.0);
     camera_bG->SetPosition(xc_bG, yc_bG, d_bG);
 
+    // fG
+    auto origin_fG{ imageData_fG->GetOrigin() };
+    auto spacing_fG{ imageData_fG->GetSpacing() };
+    auto extent_fG{ imageData_fG->GetExtent() };
 
-    // setup bg camera to fill the renderer with the image
-    auto origin_fG{ imageDataVectorField->GetOrigin() };
-    auto spacing_fG{ imageDataVectorField->GetSpacing() };
-    auto extent_fG{ imageDataVectorField->GetExtent() };
-
-    //auto camera{ m_Renderer_bG->GetActiveCamera() };
     auto camera_fG{ m_Renderer_fG->GetActiveCamera() };
     camera_fG->ParallelProjectionOn();
-
+    
     auto xc_fG{ origin_fG[0] + 0.5 * (extent_fG[0] + extent_fG[1]) * spacing_fG[0] };
     auto yc_fG{ origin_fG[1] + 0.5 * (extent_fG[2] + extent_fG[3]) * spacing_fG[1] };
 
     auto yd_fG{ (extent_fG[3] - extent_fG[2] + 1) * spacing_fG[1] };
     auto d_fG{ camera_fG->GetDistance() };
-    //this sets the background camera to cover all of the available openglwindow(space)
     camera_fG->SetParallelScale(0.5 * yd_fG);
-    camera_fG->SetFocalPoint(xc_fG, yc_fG, 0.0);
-    camera_fG->SetPosition(xc_fG, yc_fG, d_fG);
-
+    //todo this breaks when scaling the actor... is this correct now, or not?
+    /*camera_fG->SetFocalPoint(xc_fG, yc_fG, 0.0);
+    camera_fG->SetPosition(xc_fG, yc_fG, d_fG);*/
+    ////////////////////////////
     
     m_RenderWindow->Render();
 
 
-    //todo: would(nt) it be better to have this as a static function? -> think of a nicer way to actually trigger the rendering
-    TDD_Raytracer raytracer{};
-    //todo: use the values from the UI instead of hardcoded values!
-    constexpr float light_x{ 512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
-    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z);
+    
 }

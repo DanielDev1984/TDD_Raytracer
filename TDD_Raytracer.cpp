@@ -197,15 +197,22 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	imageWriter.createPPM(referenceCanvas);
 }
 
-void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z)
+void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName,bool useDimAsFileName)
 {
 	Canvas referenceCanvas(256, 256);
 	//const float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
 	const float light_x{ lightPos_x }, light_y{ lightPos_y }, light_z{ lightPos_z };
-	std::string filename{};
-	filename += "X_" + std::to_string((int)light_x) + "Y_" + std::to_string((int)light_y) + "Z_" + std::to_string((int)light_z)+".ppm";
+	std::string fN{};
+	if (useDimAsFileName)
+	{
+		fN += "X_" + std::to_string((int)light_x) + "Y_" + std::to_string((int)light_y) + "Z_" + std::to_string((int)light_z) + ".ppm";
+	}
+	else
+	{
+		fN = fileName + ".ppm";
+	}
 	//PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWithPhongShading.ppm" };
-	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), filename };
+	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), fN };
 
 	const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
 	constexpr int sphere_Radius{ 1 };
@@ -231,7 +238,7 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 	const auto imageSize{ referenceCanvas.getDimX() * referenceCanvas.getDimY() };
 	int progress{ 0 };
 	std::cout << "starting raytracing (sphere with Phong shading)\n";
-	std::cout << "output filename: " << filename << "\n";
+	std::cout << "output filename: " << fN << "\n";
 
 	for (auto x = 0; x < referenceCanvas.getDimX(); x++)
 	{
@@ -291,7 +298,7 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 			updateProgressBar(progress);
 		}
 	}
-	std::cout << "\nend raytracing, write ppm";
+	std::cout << "\nend raytracing, write ppm" << "\n";
 	imageWriter.createPPM(referenceCanvas);
 }
 //todo: update progressbar on qt-GUI (instead of console!)
