@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
 #include <QImage>
+#include <qpainter.h>
 
 #include <vtkActor.h>
 #include <vtkImageActor.h>
@@ -41,8 +42,38 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     m_Interactor->SetInteractorStyle(m_InteractorStyle);
     m_Interactor->Initialize();
 
+    QPixmap pixmap(256, 256);
+    pixmap.fill(QColor("transparent"));
+
+    QPainter painter(&pixmap);
+    //todo take color set from the GUI
+    painter.setBrush(QBrush(Qt::green));
+    painter.setOpacity(0.5);
+    //todo take coordinates set from the GUI
+    QPoint centerpoint{ 128, 0 };
+    painter.drawEllipse(centerpoint, 128,128);
+    ui.painterLabel->setPixmap(pixmap);
+
+    QPixmap pixmap2(41, 41);
+    pixmap2.fill(QColor("transparent"));
+
+    QPainter painter2(&pixmap2);
+    //todo take color set from the GUI
+    painter2.setBrush(QBrush(Qt::red));
+    
+    //todo take coordinates set from the GUI
+    QPoint centerpoint2{ 20, 20 };
+    painter2.drawEllipse(centerpoint2, 20, 20);
+    ui.label->setPixmap(pixmap2);
+
 
     QObject::connect(ui.pushButton, &QPushButton::clicked, this, &QtWidget_VtkSandbox::onRenderButtonClicked);
+    QObject::connect(ui.verticalSlider, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherPosSliderYChanged);
+    QObject::connect(ui.horizontalSlider_4, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherPosSliderXChanged);
+    //rgb sphere color
+    QObject::connect(ui.horizontalSlider, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
+    QObject::connect(ui.horizontalSlider_2, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
+    QObject::connect(ui.horizontalSlider_3, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
     //todo: use this function to read the light pos set by the user (?), or is there a better way?
     //QObject::connect(ui.lightPos_X, &QLineEdit::selectionChanged, this, &QtWidget_VtkSandbox::onLightPosXChanged);
 }
@@ -131,8 +162,6 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
                     pixel[1] = glyphScalingFactor * double(y - lightYPos) / length;
                     pixel[2] = 0;
                 }
-                
-
             }
         }
     }
@@ -238,4 +267,63 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
 
 
     
+}
+
+void QtWidget_VtkSandbox::onSpherPosSliderXChanged(int valX)
+{
+    QPixmap pixmap(256, 256);
+    pixmap.fill(QColor("transparent"));
+    QPainter painter(&pixmap);
+    //todo take color set from the GUI
+    QBrush brush{ QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value()) };
+    painter.setBrush(brush);
+    painter.setOpacity(0.5);
+    //todo take coordinates set from the GUI
+    QPoint centerpoint{ valX, ui.verticalSlider->value() };
+    painter.drawEllipse(centerpoint, 128, 128);
+    ui.painterLabel->setPixmap(pixmap);
+    std::cout << valX << "\n";
+}
+
+void QtWidget_VtkSandbox::onSpherPosSliderYChanged(int valY)
+{
+    QPixmap pixmap(256, 256);
+    pixmap.fill(QColor("transparent"));
+    QPainter painter(&pixmap);
+    //todo take color set from the GUI
+    QBrush brush{ QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value()) };
+    painter.setBrush(brush);
+    painter.setOpacity(0.5);
+    //todo take coordinates set from the GUI
+    QPoint centerpoint{ ui.horizontalSlider_4->value(), valY  };
+    painter.drawEllipse(centerpoint, 128, 128);
+    ui.painterLabel->setPixmap(pixmap);
+    std::cout << valY << "\n";
+}
+
+void QtWidget_VtkSandbox::onSpherColorChanged(int val)
+{
+    QPixmap pixmap2(41, 41);
+    pixmap2.fill(QColor("transparent"));
+
+    QPainter painter2(&pixmap2);
+    //todo take color set from the GUI
+    QBrush brush{QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value())};
+    painter2.setBrush(brush);
+
+    //todo take coordinates set from the GUI
+    QPoint centerpoint2{ 20, 20 };
+    painter2.drawEllipse(centerpoint2, 20, 20);
+    ui.label->setPixmap(pixmap2);
+
+    QPixmap pixmap(256, 256);
+    pixmap.fill(QColor("transparent"));
+    QPainter painter(&pixmap);
+    //todo take color set from the GUI
+    painter.setBrush(brush);
+    painter.setOpacity(0.5);
+    //todo take coordinates set from the GUI
+    QPoint centerpoint{ ui.horizontalSlider_4->value(), ui.verticalSlider->value() };
+    painter.drawEllipse(centerpoint, 128, 128);
+    ui.painterLabel->setPixmap(pixmap);
 }
