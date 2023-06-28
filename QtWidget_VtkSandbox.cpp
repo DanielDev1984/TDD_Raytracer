@@ -4,22 +4,18 @@
 #include <QGraphicsPixmapItem>
 #include <QImage>
 
-#include <vtkSphereSource.h>
-#include <vtkArrowSource.h>
 #include <vtkActor.h>
 #include <vtkImageActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPNMReader.h>
-#include <vtkImageCanvasSource2D.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
 #include <vtkPointData.h>
 #include <vtkGlyph2D.h>
-#include <vtkImageSliceMapper.h>
-#include <vtkImageSlice.h>
 #include <vtkNamedColors.h>
 #include <vtkProperty.h>
 #include <vtkMaskPoints.h>
+#include <vtkGlyphSource2D.h>
 
 
 #include "TDD_Raytracer.h"
@@ -34,12 +30,6 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     m_InteractorStyle{ vtkSmartPointer<vtkInteractorStyle>::New() }
 {
     ui.setupUi(this);
-    QGraphicsScene* scene = new QGraphicsScene();
-    ui.graphicsView->setScene(scene);
-    QImage* image = new QImage();
-    QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(*image));
-    scene->addItem(item);
-    ui.graphicsView->show();
 
     m_RenderWindow->AddRenderer(m_Renderer_fG);
     m_RenderWindow->AddRenderer(m_Renderer_bG);
@@ -70,27 +60,22 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //todo: would(nt) it be better to have this as a static function? -> think of a nicer way to actually trigger the rendering
     TDD_Raytracer raytracer{};
     //todo: use the values from the UI instead of hardcoded values!
-    constexpr float light_x{ 512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+    constexpr float light_x{ 256.0 }, light_y{ 256.0 }, light_z{ -64.0 };
     raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false);
 
     // read input data
     //todo: outsource this to own function
     vtkSmartPointer<vtkPNMReader> imageReader_bG{ vtkSmartPointer<vtkPNMReader>::New() };
-    vtkSmartPointer<vtkPNMReader> imageReader_fG{ vtkSmartPointer<vtkPNMReader>::New() };
-    // for some reason, the input data range seems to be restricted to maxVal 128 (?)
+    //todo: investigate -> for some reason, the input data range seems to be restricted to maxVal 128 (?)
     // the input data needs to be a binary (i.e. P6) ppm
+    // todo transform the P3 encoded data to P6 ppm!
     constexpr auto fN_bG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\renderedImage_P6.ppm" };
-    constexpr auto fN_fG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\vectorfield.ppm" };
     
     //todo: figure out how to use vtkOutpuWindow for managing the application output
-    std::cout << "input filename foreground: " << fN_bG << "\n";
-    std::cout << "input filename foreground: " << fN_fG << "\n";
-    
-    auto const fileReadSucces_fG{ (imageReader_fG->CanReadFile(fN_fG) > 0) ? "image file fG could be read" : "image file fG could not be read" };
-    std::cout << fileReadSucces_fG << "\n";
+    std::cout << "input filename background: " << fN_bG << "\n";
     
     // setup the background
-    auto const fileReadSucces_bG{ (imageReader_bG->CanReadFile(fN_bG) > 0) ? "image file bG could be read" : "image file bG could not be read" };
+    auto const fileReadSucces_bG{ (imageReader_bG->CanReadFile(fN_bG) > 0) ? "image file bG could be read" : "!! image file bG could not be read !!" };
     std::cout << fileReadSucces_bG << "\n";
     imageReader_bG->SetFileName(fN_bG);
     imageReader_bG->Update();
@@ -109,61 +94,92 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
 
     // setup the "overlay" / fG
     /////////////////////
-    imageReader_fG->SetFileName(fN_fG);
-    imageReader_fG->Update();
-    auto imageData_fG{ imageReader_fG->GetOutput() };
     
-
-    const auto imageDimensions_fG{ imageData_fG->GetDimensions() };
+    const auto imageDimensions_fG{ imageDimensions_bG };
     std::cout << "imageDimensions_fG_X: " << imageDimensions_fG[0] << "\n";
     std::cout << "imageDimensions_fG_Y: " << imageDimensions_fG[1] << "\n";
     std::cout << "imageDimensions_fG_Z: " << imageDimensions_fG[2] << "\n";
+
+
+    //generate Vectorfield
+    //todo: outsource this to TDDRaytracer::generateVectorfield / ::generateLightsourceRepresentation (?)
+    vtkNew<vtkImageData> imageData_VectorField;
+    imageData_VectorField->SetDimensions(imageDimensions_fG[0], imageDimensions_fG[1], imageDimensions_fG[2]);
+    imageData_VectorField->AllocateScalars(VTK_INT, 3);
+    
+    // this factor takes into account that on the raytracer side sth seems to be off when it comes to placing the lightsource
+    constexpr auto cameraPosCorrectionFactor{ 2 };
+    constexpr auto lightXPos{ light_x / cameraPosCorrectionFactor };
+    constexpr auto lightYPos{ light_y / cameraPosCorrectionFactor };
+    constexpr auto glyphScalingFactor{ 7 };
+
+    int* fGImageDims = imageData_VectorField->GetDimensions();
+
+    for (int z = 0; z < fGImageDims[2]; z++)
+    {
+        for (int y = 0; y < fGImageDims[1]; y++)
+        {
+            for (int x = 0; x < fGImageDims[0]; x++)
+            {
+                
+                {
+                    int* pixel =
+                        static_cast<int*>(imageData_VectorField->GetScalarPointer(x, y, z));
+                    //todo: calculate unitvector by means of vtk, not own implementation and make this a little bit more efficient
+                    const auto length{sqrt(double(x - lightXPos)* double(x - lightXPos) + double(y - lightYPos)* double(y - lightYPos))};
+                    pixel[0] = glyphScalingFactor * double(x - lightXPos) / length;
+                    pixel[1] = glyphScalingFactor * double(y - lightYPos) / length;
+                    pixel[2] = 0;
+                }
+                
+
+            }
+        }
+    }
+
+    imageData_VectorField->GetPointData()->SetActiveVectors(imageData_VectorField->GetPointData()->GetScalars()->GetName());
   
     // setup the mask used for populating the glyphfilter
-    constexpr auto samplingRate{ 700 };
+    constexpr auto samplingRate{ 200 };
     vtkNew<vtkMaskPoints> maskPoints;
     maskPoints->SetOnRatio(samplingRate); // keep every nth (== "samplingRate") point
 
-    
-    maskPoints->SetInputData(imageData_fG);
+    maskPoints->SetInputData(imageData_VectorField);
     
     
     maskPoints->Update();
     // update needs to be called first, otherwise data is not yet available!
-    // make sure the orientation of the input (vectorfield) is used for orienting the glyphs
-    maskPoints->GetOutput()->GetPointData()->SetActiveVectors(maskPoints->GetOutput()->GetPointData()->GetScalars()->GetName());
+    // make sure the correct orientation of the input (vectorfield) is used for orienting the glyphs lateron
+   maskPoints->GetOutput()->GetPointData()->SetActiveVectors(imageData_VectorField->GetPointData()->GetVectors()->GetName());
     
-    vtkSmartPointer<vtkArrowSource> arrowSource{ vtkSmartPointer<vtkArrowSource>::New() };
-    arrowSource->InvertOff();
+    
+    vtkSmartPointer<vtkGlyphSource2D> arrowSource{ { vtkSmartPointer<vtkGlyphSource2D>::New() } };
+    arrowSource->SetGlyphTypeToArrow();
     arrowSource->Update();
-   
-    
-
     
 
     vtkSmartPointer<vtkGlyph2D> glyphFilter{ vtkSmartPointer<vtkGlyph2D>::New() };
     glyphFilter->SetInputConnection(maskPoints->GetOutputPort());
     glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
-    
-    glyphFilter->ScalingOn();
-    glyphFilter->OrientOn();
-    glyphFilter->SetScaleModeToScaleByScalar();
-    glyphFilter->SetScaleFactor(0.1); //todo: normalize the size of the arrow glyphs!
-    
+    glyphFilter->SetOrient(true);
+    // this is essential for actually orienting the glyphs correctly lateron!
+    glyphFilter->SetScaleModeToScaleByVector(); 
+    glyphFilter->SetVectorModeToUseVector();
+    glyphFilter->GetOutput()->GetPointData()->SetActiveVectors(imageData_VectorField->GetPointData()->GetVectors()->GetName());
     glyphFilter->Update();
 
     vtkSmartPointer<vtkPolyDataMapper> vectorMapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
     // without this, trying to set the color of the arrows manually lateron isnt working (and instead a scalar value of the vector is being used)
     vectorMapper->ScalarVisibilityOff();
     vectorMapper->SetInputConnection(glyphFilter->GetOutputPort());
+    vectorMapper->Update();
 
     vtkSmartPointer<vtkActor> vectorActor{ vtkSmartPointer<vtkActor>::New() };
 
     vectorActor->SetMapper(vectorMapper);
     vtkNew<vtkNamedColors> colors;
-    auto constexpr glyphColor{ "White" };
-    vectorActor->GetProperty()->SetColor(
-        colors->GetColor3d(glyphColor).GetData());
+    auto constexpr glyphColor{ "white_smoke" };
+    vectorActor->GetProperty()->SetColor(colors->GetColor3d(glyphColor).GetData());
 
     // setting up the "rest" of the scene
 
@@ -172,7 +188,7 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //m_Renderer_fG->AddViewProp(imageSlice);
 
     //todo: hack for letting the manually generated vectorfield point in the correct direction (indicating from where the light is comming for rendering the sphere
-    vectorActor->SetScale(-1,1,1);
+    vectorActor->SetScale(1,1,1);
     
     m_Renderer_fG->AddViewProp(vectorActor);
     m_Renderer_fG->ResetCamera();
@@ -200,9 +216,9 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     camera_bG->SetPosition(xc_bG, yc_bG, d_bG);
 
     // fG
-    auto origin_fG{ imageData_fG->GetOrigin() };
-    auto spacing_fG{ imageData_fG->GetSpacing() };
-    auto extent_fG{ imageData_fG->GetExtent() };
+    auto origin_fG{ origin_bG };
+    auto spacing_fG{ spacing_bG };
+    auto extent_fG{ extent_bG };
 
     auto camera_fG{ m_Renderer_fG->GetActiveCamera() };
     camera_fG->ParallelProjectionOn();
