@@ -20,10 +20,8 @@ public:
 
 public slots:
     void onRenderButtonClicked();
-    void onSpherPosSliderYChanged(int valY);
-    void onSpherPosSliderXChanged(int valX);
-    void onSpherColorChanged(int val);
     void onLightPosXChanged();
+    void redrawRaytracePreview();
 private:
     Ui::QtWidget_VtkSandboxClass ui;
 

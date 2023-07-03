@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
-    <height>609</height>
+    <width>914</width>
+    <height>695</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>10</y>
       <width>81</width>
       <height>16</height>
@@ -53,7 +53,7 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>260</x>
       <y>10</y>
       <width>81</width>
       <height>16</height>
@@ -66,7 +66,7 @@
    <widget class="QLineEdit" name="lightPos_Y">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>30</y>
       <width>113</width>
       <height>22</height>
@@ -76,7 +76,7 @@
    <widget class="QLineEdit" name="lightPos_Z">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>260</x>
       <y>30</y>
       <width>113</width>
       <height>22</height>
@@ -112,8 +112,8 @@
    <widget class="QVTKOpenGLNativeWidget" name="openGLWidget">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>130</y>
+      <x>580</x>
+      <y>290</y>
       <width>261</width>
       <height>261</height>
      </rect>
@@ -122,7 +122,7 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>260</x>
       <y>70</y>
       <width>81</width>
       <height>16</height>
@@ -148,7 +148,7 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>70</y>
       <width>81</width>
       <height>16</height>
@@ -171,7 +171,7 @@
    <widget class="QLineEdit" name="lightPos_Y_2">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>90</y>
       <width>113</width>
       <height>22</height>
@@ -181,7 +181,7 @@
    <widget class="QLineEdit" name="lightPos_Z_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>260</x>
       <y>90</y>
       <width>113</width>
       <height>22</height>
@@ -214,10 +214,10 @@
      <string>define lightSourcePos (x-y)</string>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider">
+   <widget class="QSlider" name="colorSliderR">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>550</x>
       <y>30</y>
       <width>91</width>
       <height>22</height>
@@ -230,10 +230,10 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_2">
+   <widget class="QSlider" name="colorSliderG">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>550</x>
       <y>60</y>
       <width>91</width>
       <height>22</height>
@@ -246,10 +246,10 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_3">
+   <widget class="QSlider" name="colorSliderB">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>550</x>
       <y>90</y>
       <width>91</width>
       <height>22</height>
@@ -265,7 +265,7 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>550</x>
       <y>10</y>
       <width>81</width>
       <height>16</height>
@@ -278,7 +278,7 @@
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>650</x>
       <y>30</y>
       <width>16</width>
       <height>20</height>
@@ -291,7 +291,7 @@
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>650</x>
       <y>60</y>
       <width>16</width>
       <height>20</height>
@@ -304,7 +304,7 @@
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>650</x>
       <y>90</y>
       <width>16</width>
       <height>20</height>
@@ -317,8 +317,8 @@
    <widget class="QLabel" name="painterLabel">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>130</y>
+      <x>180</x>
+      <y>290</y>
       <width>261</width>
       <height>261</height>
      </rect>
@@ -327,7 +327,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QSlider" name="verticalSlider">
+   <widget class="QSlider" name="spherePosSliderY">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -343,7 +343,7 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QSlider" name="horizontalSlider_4">
+   <widget class="QSlider" name="spherePosSliderX">
     <property name="geometry">
      <rect>
       <x>470</x>
@@ -362,10 +362,10 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="colorPreviewLabel">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>670</x>
       <y>50</y>
       <width>41</width>
       <height>41</height>
@@ -375,13 +375,159 @@
      <string>TextLabel</string>
     </property>
    </widget>
+   <widget class="QSlider" name="lightPosSliderY">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>60</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>30</y>
+      <width>16</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>x</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>60</y>
+      <width>16</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>y</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>10</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>lightPos</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="lightPosSliderX">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>30</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="painterLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>290</y>
+      <width>261</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_15">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>260</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>raytraced Sphere</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_16">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>260</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>simulated shading</string>
+    </property>
+   </widget>
+   <zorder>pushButton</zorder>
+   <zorder>lightPos_X</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_3</zorder>
+   <zorder>lightPos_Y</zorder>
+   <zorder>lightPos_Z</zorder>
+   <zorder>raytracing_ProgressBar</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+   <zorder>label_6</zorder>
+   <zorder>label_7</zorder>
+   <zorder>lightPos_X_2</zorder>
+   <zorder>lightPos_Y_2</zorder>
+   <zorder>lightPos_Z_2</zorder>
+   <zorder>radioButton</zorder>
+   <zorder>radioButton_2</zorder>
+   <zorder>colorSliderR</zorder>
+   <zorder>colorSliderG</zorder>
+   <zorder>colorSliderB</zorder>
+   <zorder>label_8</zorder>
+   <zorder>label_9</zorder>
+   <zorder>label_10</zorder>
+   <zorder>label_11</zorder>
+   <zorder>spherePosSliderY</zorder>
+   <zorder>spherePosSliderX</zorder>
+   <zorder>colorPreviewLabel</zorder>
+   <zorder>lightPosSliderY</zorder>
+   <zorder>label_12</zorder>
+   <zorder>label_13</zorder>
+   <zorder>label_14</zorder>
+   <zorder>lightPosSliderX</zorder>
+   <zorder>painterLabel_2</zorder>
+   <zorder>painterLabel</zorder>
+   <zorder>openGLWidget</zorder>
+   <zorder>label_15</zorder>
+   <zorder>label_16</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>733</width>
+     <width>914</width>
      <height>22</height>
     </rect>
    </property>

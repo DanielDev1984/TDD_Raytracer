@@ -81,16 +81,20 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     //todo take coordinates set from the GUI
     QPoint centerpoint2{ 20, 20 };
     painter2.drawEllipse(centerpoint2, 20, 20);
-    ui.label->setPixmap(pixmap2);
+    ui.colorPreviewLabel->setPixmap(pixmap2);
 
 
     QObject::connect(ui.pushButton, &QPushButton::clicked, this, &QtWidget_VtkSandbox::onRenderButtonClicked);
-    QObject::connect(ui.verticalSlider, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherPosSliderYChanged);
-    QObject::connect(ui.horizontalSlider_4, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherPosSliderXChanged);
+    QObject::connect(ui.spherePosSliderY, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    QObject::connect(ui.spherePosSliderX, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
     //rgb sphere color
-    QObject::connect(ui.horizontalSlider, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
-    QObject::connect(ui.horizontalSlider_2, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
-    QObject::connect(ui.horizontalSlider_3, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::onSpherColorChanged);
+    QObject::connect(ui.colorSliderR, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    QObject::connect(ui.colorSliderG, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    QObject::connect(ui.colorSliderB, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    //todo: add a function to redraw the sphere preview 
+    QObject::connect(ui.lightPosSliderX, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    QObject::connect(ui.lightPosSliderY, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+    
     //todo: use this function to read the light pos set by the user (?), or is there a better way?
     //QObject::connect(ui.lightPos_X, &QLineEdit::selectionChanged, this, &QtWidget_VtkSandbox::onLightPosXChanged);
 }
@@ -286,76 +290,32 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     
 }
 
-void QtWidget_VtkSandbox::onSpherPosSliderXChanged(int valX)
+void QtWidget_VtkSandbox::redrawRaytracePreview()
 {
-    QPixmap pixmap(256, 256);
-    pixmap.fill(QColor("transparent"));
-    QPainter painter(&pixmap);
-    //todo take color set from the GUI
+    QPixmap pixmapColorPreview(41, 41);//todo take the acutal size of the label
+    pixmapColorPreview.fill(QColor("transparent"));
+
+    QPainter painterColorPreview(&pixmapColorPreview);
+    QBrush brushColorPreview{ QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value()) };
 
 
-    QRadialGradient gr(128, 128, 200);//todo: take position from the actual pos-sliders
-    gr.setColorAt(0.0, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.2, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.9, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 63));
-    gr.setColorAt(0.95, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 127));
-    gr.setColorAt(1, QColor(0, 0, 0, 0));
 
-    painter.setBrush(gr);
-    //todo take coordinates set from the GUI
-    QPoint centerpoint{ valX, ui.verticalSlider->value() };
-    painter.drawEllipse(centerpoint, 128, 128);
-    ui.painterLabel->setPixmap(pixmap);
-    std::cout << valX << "\n";
-
-
-}
-
-void QtWidget_VtkSandbox::onSpherPosSliderYChanged(int valY)
-{
-    QPixmap pixmap(256, 256);
-    pixmap.fill(QColor("transparent"));
-    QPainter painter(&pixmap);
-    //todo take color set from the GUI
-    QRadialGradient gr(128, 128, 200);//todo: take position from the actual pos-sliders
-    gr.setColorAt(0.0, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.2, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.9, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 63));
-    gr.setColorAt(0.95, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 127));
-    gr.setColorAt(1, QColor(0, 0, 0, 0));
-
-    painter.setBrush(gr);
-    //todo take coordinates set from the GUI
-    QPoint centerpoint{ ui.horizontalSlider_4->value(), valY  };
-    painter.drawEllipse(centerpoint, 128, 128);
-    ui.painterLabel->setPixmap(pixmap);
-    std::cout << valY << "\n";
-}
-
-void QtWidget_VtkSandbox::onSpherColorChanged(int val)
-{
-    QPixmap pixmap2(41, 41);//todo take the acutal size of the label
-    pixmap2.fill(QColor("transparent"));
-
-    QPainter painter2(&pixmap2);
-    QBrush brush{QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value())};
-
-    
-
-    painter2.setBrush(brush);
+    painterColorPreview.setBrush(brushColorPreview);
 
     //todo take coordinates set from the GUI
-    QPoint centerpoint2{ 20, 20 };
-    painter2.drawEllipse(centerpoint2, 20, 20);
-    ui.label->setPixmap(pixmap2);
+    QPoint centerpointColorPreviewLabel{ 20, 20 };
+    painterColorPreview.drawEllipse(centerpointColorPreviewLabel, 20, 20);
+    ui.colorPreviewLabel->setPixmap(pixmapColorPreview);
 
     // draw the "big" preview of the shaded "sphere"
-    QRadialGradient gr(128, 128, 200);//todo: take position from the actual pos-sliders
-    gr.setColorAt(0.0, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.2, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 191));
-    gr.setColorAt(0.9, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 63));
-    gr.setColorAt(0.95, QColor(ui.horizontalSlider->value(), ui.horizontalSlider_2->value(), ui.horizontalSlider_3->value(), 127));
+    QRadialGradient gr(ui.lightPosSliderX->value(), ui.lightPosSliderY->value(), 200);//todo: take position from the actual pos-sliders
+    gr.setColorAt(0.0, QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value(), 0));
+    gr.setColorAt(0.2, QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value(), 63));
+    gr.setColorAt(0.9, QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value(), 191));
+    gr.setColorAt(1.0, QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value(), 255));
+    //gr.setColorAt(0.95, QColor(ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value(), 127));
     gr.setColorAt(1, QColor(0, 0, 0, 0));
+
     QPixmap pixmap(256, 256);
     pixmap.fill(QColor("transparent"));
     QPainter painter(&pixmap);
@@ -363,7 +323,18 @@ void QtWidget_VtkSandbox::onSpherColorChanged(int val)
     painter.setBrush(gr);
     //painter.setOpacity(0.5);
     //todo take coordinates set from the GUI
-    QPoint centerpoint{ ui.horizontalSlider_4->value(), ui.verticalSlider->value() };
+    QPoint centerpoint{ ui.spherePosSliderX->value(), ui.spherePosSliderY->value() };
     painter.drawEllipse(centerpoint, 128, 128);
     ui.painterLabel->setPixmap(pixmap);
+
+    QPixmap pixmap_Ambient(256, 256);
+    pixmap_Ambient.fill(QColor("transparent"));
+    QPainter painter_Ambient(&pixmap_Ambient);
+    //todo take color set from the GUI
+    painter_Ambient.setBrush(brushColorPreview);
+    painter_Ambient.setOpacity(0.3);
+    //painter.setOpacity(0.5);
+    //todo take coordinates set from the GUI
+    painter_Ambient.drawEllipse(centerpoint, 128, 128);
+    ui.painterLabel_2->setPixmap(pixmap_Ambient);
 }
