@@ -197,21 +197,12 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	imageWriter.createPPM(referenceCanvas);
 }
 
-void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName,bool useDimAsFileName, unsigned int color_r, unsigned int color_g, unsigned int color_b)
+void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName, std::array<unsigned int, 3> sphereColor)
 {
 	Canvas referenceCanvas(256, 256);
-	//const float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
 	const float light_x{ lightPos_x }, light_y{ lightPos_y }, light_z{ lightPos_z };
 	std::string fN{};
-	if (useDimAsFileName)
-	{
-		fN += "X_" + std::to_string((int)light_x) + "Y_" + std::to_string((int)light_y) + "Z_" + std::to_string((int)light_z) + ".ppm";
-	}
-	else
-	{
-		fN = fileName + ".ppm";
-	}
-	//PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), "sphereWithPhongShading.ppm" };
+	fN = fileName;
 	PPMWriter imageWriter{ referenceCanvas.getDimX(), referenceCanvas.getDimY(), fN };
 
 	const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
@@ -224,8 +215,10 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 	sO.setSphereScaling(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
 	sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
 
-	constexpr float ambientFactor{ 0.3 }, diffuseFactor{ 0.9 }, specularFactor{ 0.0 }, shininessFactor{ 0.0 };
+	constexpr float ambientFactor{ 1.3 }, diffuseFactor{ 0.9 }, specularFactor{ 0.0 }, shininessFactor{ 0.0 };
 	
+	const auto [color_r, color_g, color_b] = sphereColor;
+
 	const auto valR_normalized{ float(color_r / 255.0) };
 	const auto valG_normalized{ float(color_g / 255.0) };
 	const auto valB_normalized{ float(color_b / 255.0) };
@@ -270,33 +263,6 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 				eyeVector = aS_local.getNormalizedVector();
 				auto colorAtHitPoint{ sO.getPhongShadedSurfaceColor(m, lS, hitPointCoordinates, surfaceNormalAtHitPoint,eyeVector ) };
 				referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(colorAtHitPoint, 255.0));
-				//referenceCanvas.setImageData(x, y, ArithmeticStructures::multiplyWithScalar(ArithmeticStructures::HomogenousCoordinates{ (int)(0.0),255-(int)(actualHit),(int)(0.0),1.0 }, 1.0));
-			}//todo: enable this branch again to calculate light direction / vector field lateron
-			else if(false)// draw background
-			{
-				// todo: instead of trying to colorize the background, calculate a 2d vectorfield for every "pixel" on the imageplane, representing the direction of the lightsource. out of this an overlay could be calculated thar represents the lightsource as e.g. "arrows" or similar
-				// 
-				// 
-				// 
-				// the lightsource is visualized as a unidirectional (point)lightsource with decreasing luminance wrt 
-				//const auto luminance{ (int)(255.0 * (x * 100.0 / 255.0) * 0.01) };
-				ArithmeticStructures::HomogenousCoordinates lightOrigin{ light_x,light_y, 0.0, 1.0 };
-				ArithmeticStructures::HomogenousCoordinates pointOnImageplane{ x,y, 0.0, 1.0 };
-				auto vectorLightSourceToImagePoint{ ArithmeticStructures::subtractCoordinates(pointOnImageplane, lightOrigin) };
-				ArithmeticStructures aS{};
-				const auto& [x_local, y_local, z_local, w] = vectorLightSourceToImagePoint;
-				aS.setVector(x_local,y_local,z_local);
-
-				//auto luminance{ 600.0 - sqrt(pow(x_local, 2.0) + (y_local, 2.0)) };
-
-				//todo: find a proper, dynamic value, that allows for a smooth, radial, gradient of the lightsource
-				auto luminance{700.0 - (aS.magnitude())};
-				luminance < 0 || luminance > 255 ? 
-					referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ 255,0,0,1.0 }) : 
-					referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
-				//referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
-				//const auto luminance{ 143.0 };
-				//referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(luminance),(int)(luminance),(int)(luminance),1.0 });
 			}
 			// convenience function for debug / progress output
 			progress = int((x * referenceCanvas.getDimY() + y) * 100 / imageSize);

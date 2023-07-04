@@ -118,8 +118,9 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //todo: pass the sphere position parameter from the gui to this function
     std::cout << "lightSourcePos X: " << ui.lightPosSliderX->value() << "\n";
     std::cout << "lightSourcePos Y: " << ui.lightPosSliderY->value() << "\n";
-
-    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false, ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value());
+    // set the sphere color of the raytraced sphere
+    const std::array<unsigned int, 3> sphereColor{ ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value() };
+    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", sphereColor);
 
     // read input data
     //todo: outsource this to own function
@@ -132,8 +133,6 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     std::cout << "input filename background: " << fN_bG << "\n";
     
     // setup the background
-    auto const fileReadSucces_bG{ (imageReader_bG->CanReadFile(fN_bG) > 0) ? "image file bG could be read" : "!! image file bG could not be read !!" };
-    std::cout << fileReadSucces_bG << "\n";
     imageReader_bG->SetFileName(fN_bG);
     imageReader_bG->Update();
     const auto imageData_bG{ imageReader_bG->GetOutput() };

@@ -3,7 +3,7 @@
 PPMWriter::PPMWriter(int dimX, int dimY, std::string filename) : 
 	m_dimX{ dimX }, 
 	m_dimY{ dimY }, 
-	m_filename{ filename } {};
+	m_filename{ filename+".ppm"} {};
 
 // create a binary (i.e. "P6") ppm
 //todo: adapt tests when needed!
@@ -12,7 +12,8 @@ void PPMWriter::createPPM(Canvas& c) {
 
         /* Open PPM File */
         FILE* file;
-        errno_t err = fopen_s(&file, "renderedImage.ppm", "wb");
+        //errno_t err = fopen_s(&file, "renderedImage.ppm", "wb");
+        errno_t err = fopen_s(&file, m_filename.c_str(), "wb");
         if (err==0)
         {
             std::cout << "fopen succeeded!" << "\n";

@@ -7,7 +7,7 @@ public:
 	void calculateAndDrawClock();
 	void drawSphereWithBasicShading(); // the closer the sphere is to the rays origin, the brighter the color
 	//todo: change the function signature -> currently too much information needs to be passed
-	void drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName, bool useDimAsFileName, unsigned int color_r, unsigned int color_g, unsigned int color_b);
+	void drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName, std::array<unsigned int, 3> sphereColor);
 private:
 	void updateProgressBar(int progressPercentage);
 	void initProgressBar() { std::cout << "Progress [%] : "; m_progress = 0; };
