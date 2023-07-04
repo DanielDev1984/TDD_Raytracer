@@ -113,9 +113,11 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
 {
     //todo: would(nt) it be better to have this as a static function? -> think of a nicer way to actually trigger the rendering
     TDD_Raytracer raytracer{};
-    //todo: use the values from the UI instead of hardcoded values!
-    constexpr float light_x{ 256.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+    //todo: get rid of magic number used for scaling the sliderPos wrt to the actual light position used for the rendering
+    const float light_x{ float(ui.lightPosSliderX->value() *2.0) }, light_y{ float(ui.lightPosSliderY->value() * 2.0) }, light_z{ -64.0 };
     //todo: pass the sphere position parameter from the gui to this function
+    std::cout << "lightSourcePos X: " << ui.lightPosSliderX->value() << "\n";
+    std::cout << "lightSourcePos Y: " << ui.lightPosSliderY->value() << "\n";
 
     raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false);
 
@@ -163,9 +165,11 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     imageData_VectorField->AllocateScalars(VTK_INT, 3);
     
     // this factor takes into account that on the raytracer side sth seems to be off when it comes to placing the lightsource
-    constexpr auto cameraPosCorrectionFactor{ 2 };
-    constexpr auto lightXPos{ light_x / cameraPosCorrectionFactor };
-    constexpr auto lightYPos{ light_y / cameraPosCorrectionFactor };
+    //todo: get rid of scaling magicnumber
+    constexpr auto cameraPosCorrectionFactor{ 2.0 };
+    const auto lightXPos{ light_x / cameraPosCorrectionFactor };
+    //todo: get rid of "coordinate-flip" magic number
+    const auto lightYPos{ 256 - (light_y / cameraPosCorrectionFactor) };
     constexpr auto glyphScalingFactor{ 7 };
 
     int* fGImageDims = imageData_VectorField->GetDimensions();
