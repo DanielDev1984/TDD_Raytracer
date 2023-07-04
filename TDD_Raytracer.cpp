@@ -197,7 +197,7 @@ void TDD_Raytracer::drawSphereWithBasicShading()
 	imageWriter.createPPM(referenceCanvas);
 }
 
-void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName,bool useDimAsFileName)
+void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const float lightPos_y, const float lightPos_z, std::string fileName,bool useDimAsFileName, unsigned int color_r, unsigned int color_g, unsigned int color_b)
 {
 	Canvas referenceCanvas(256, 256);
 	//const float light_x{512.0 }, light_y{ 256.0 }, light_z{ -64.0 };
@@ -225,7 +225,12 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 	sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
 
 	constexpr float ambientFactor{ 0.3 }, diffuseFactor{ 0.9 }, specularFactor{ 0.0 }, shininessFactor{ 0.0 };
-	constexpr ArithmeticStructures::HomogenousCoordinates color{ 0.0,0.7,0.1,1.0 };
+	
+	const auto valR_normalized{ float(color_r / 255.0) };
+	const auto valG_normalized{ float(color_g / 255.0) };
+	const auto valB_normalized{ float(color_b / 255.0) };
+	
+	const ArithmeticStructures::HomogenousCoordinates color{valR_normalized , valG_normalized,valB_normalized,1.0 };
 	Material m{ ambientFactor, diffuseFactor, specularFactor, shininessFactor,color };
 	sO.setSphereMaterial(m);
 
@@ -250,7 +255,7 @@ void TDD_Raytracer::drawSphereWithPhongShading(const float lightPos_x, const flo
 			Ray ray{ origin, direction };
 
 			auto actualHit{ sO.getSphereHit(ray) };
-
+			// we have a hit
 			if (!std::isnan(actualHit))
 			{
 				auto hitPointCoordinates{ ArithmeticStructures::HomogenousCoordinates{x,y,actualHit,1.0} };

@@ -119,7 +119,7 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     std::cout << "lightSourcePos X: " << ui.lightPosSliderX->value() << "\n";
     std::cout << "lightSourcePos Y: " << ui.lightPosSliderY->value() << "\n";
 
-    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false);
+    raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false, ui.colorSliderR->value(), ui.colorSliderG->value(), ui.colorSliderB->value());
 
     // read input data
     //todo: outsource this to own function
