@@ -94,6 +94,8 @@ QtWidget_VtkSandbox::QtWidget_VtkSandbox(QWidget *parent)
     //todo: add a function to redraw the sphere preview 
     QObject::connect(ui.lightPosSliderX, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
     QObject::connect(ui.lightPosSliderY, &QSlider::valueChanged, this, &QtWidget_VtkSandbox::redrawRaytracePreview);
+
+    //todo: make it possible to toggle visualization of lightsource overlay by using the checkbox
     
     //todo: use this function to read the light pos set by the user (?), or is there a better way?
     //QObject::connect(ui.lightPos_X, &QLineEdit::selectionChanged, this, &QtWidget_VtkSandbox::onLightPosXChanged);
@@ -113,6 +115,8 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     TDD_Raytracer raytracer{};
     //todo: use the values from the UI instead of hardcoded values!
     constexpr float light_x{ 256.0 }, light_y{ 256.0 }, light_z{ -64.0 };
+    //todo: pass the sphere position parameter from the gui to this function
+
     raytracer.drawSphereWithPhongShading(light_x, light_y, light_z, "renderedImage", false);
 
     // read input data
@@ -120,8 +124,7 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     vtkSmartPointer<vtkPNMReader> imageReader_bG{ vtkSmartPointer<vtkPNMReader>::New() };
     //todo: investigate -> for some reason, the input data range seems to be restricted to maxVal 128 (?)
     // the input data needs to be a binary (i.e. P6) ppm
-    // todo transform the P3 encoded data to P6 ppm!
-    constexpr auto fN_bG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\renderedImage_P6.ppm" };
+    constexpr auto fN_bG{ "C:\\Users\\strai\\source\\TDD_raytracer\\TDD_Raytracer\\renderedImage.ppm" };
     
     //todo: figure out how to use vtkOutpuWindow for managing the application output
     std::cout << "input filename background: " << fN_bG << "\n";
@@ -240,7 +243,12 @@ void QtWidget_VtkSandbox::onRenderButtonClicked()
     //todo: hack for letting the manually generated vectorfield point in the correct direction (indicating from where the light is comming for rendering the sphere
     vectorActor->SetScale(1,1,1);
     
-    m_Renderer_fG->AddViewProp(vectorActor);
+    // only show lightsource overlay when needed
+    if (ui.showLightsourceCB->isChecked())
+    {
+        m_Renderer_fG->AddViewProp(vectorActor);
+    }
+    
     m_Renderer_fG->ResetCamera();
     m_RenderWindow->Render();
 

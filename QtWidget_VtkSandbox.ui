@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>190</y>
+      <x>600</x>
+      <y>60</y>
       <width>75</width>
       <height>24</height>
      </rect>
@@ -27,67 +27,11 @@
      <string>Render !</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lightPos_X">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>10</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>lightPos_Y</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>10</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>lightPos_Z</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lightPos_Y">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>30</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lightPos_Z">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>30</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="raytracing_ProgressBar">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>230</y>
+      <x>600</x>
+      <y>100</y>
       <width>118</width>
       <height>23</height>
      </rect>
@@ -96,129 +40,21 @@
      <number>24</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>lightPos_X</string>
-    </property>
-   </widget>
    <widget class="QVTKOpenGLNativeWidget" name="openGLWidget">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>290</y>
+      <x>370</x>
+      <y>260</y>
       <width>261</width>
       <height>261</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>70</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>spherePos_Z</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>spherePos_X</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>70</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>spherePos_Y</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lightPos_X_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>90</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lightPos_Y_2">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>90</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lightPos_Z_2">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>90</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>130</y>
-      <width>121</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>define spherePos</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>150</y>
-      <width>171</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>define lightSourcePos (x-y)</string>
-    </property>
-   </widget>
    <widget class="QSlider" name="colorSliderR">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>30</y>
+      <x>160</x>
+      <y>60</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -233,8 +69,8 @@
    <widget class="QSlider" name="colorSliderG">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>60</y>
+      <x>160</x>
+      <y>90</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -249,8 +85,8 @@
    <widget class="QSlider" name="colorSliderB">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>90</y>
+      <x>160</x>
+      <y>120</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -265,8 +101,8 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>10</y>
+      <x>160</x>
+      <y>40</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -278,8 +114,8 @@
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>30</y>
+      <x>260</x>
+      <y>60</y>
       <width>16</width>
       <height>20</height>
      </rect>
@@ -291,8 +127,8 @@
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>60</y>
+      <x>260</x>
+      <y>90</y>
       <width>16</width>
       <height>20</height>
      </rect>
@@ -304,8 +140,8 @@
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>90</y>
+      <x>260</x>
+      <y>120</y>
       <width>16</width>
       <height>20</height>
      </rect>
@@ -317,8 +153,8 @@
    <widget class="QLabel" name="painterLabel">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>290</y>
+      <x>30</x>
+      <y>260</y>
       <width>261</width>
       <height>261</height>
      </rect>
@@ -330,10 +166,10 @@
    <widget class="QSlider" name="spherePosSliderY">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>270</y>
+      <x>360</x>
+      <y>40</y>
       <width>22</width>
-      <height>160</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="maximum">
@@ -346,9 +182,9 @@
    <widget class="QSlider" name="spherePosSliderX">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>210</y>
-      <width>160</width>
+      <x>390</x>
+      <y>130</y>
+      <width>101</width>
       <height>22</height>
      </rect>
     </property>
@@ -365,8 +201,8 @@
    <widget class="QLabel" name="colorPreviewLabel">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>50</y>
+      <x>280</x>
+      <y>80</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -378,8 +214,8 @@
    <widget class="QSlider" name="lightPosSliderY">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>60</y>
+      <x>20</x>
+      <y>90</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -394,8 +230,8 @@
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>30</y>
+      <x>120</x>
+      <y>60</y>
       <width>16</width>
       <height>20</height>
      </rect>
@@ -407,8 +243,8 @@
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>60</y>
+      <x>120</x>
+      <y>90</y>
       <width>16</width>
       <height>20</height>
      </rect>
@@ -420,8 +256,8 @@
    <widget class="QLabel" name="label_14">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>10</y>
+      <x>20</x>
+      <y>40</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -433,8 +269,8 @@
    <widget class="QSlider" name="lightPosSliderX">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>30</y>
+      <x>20</x>
+      <y>60</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -449,8 +285,8 @@
    <widget class="QLabel" name="painterLabel_2">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>290</y>
+      <x>30</x>
+      <y>260</y>
       <width>261</width>
       <height>261</height>
      </rect>
@@ -462,8 +298,8 @@
    <widget class="QLabel" name="label_15">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>260</y>
+      <x>370</x>
+      <y>230</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -475,8 +311,8 @@
    <widget class="QLabel" name="label_16">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>260</y>
+      <x>30</x>
+      <y>230</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -485,22 +321,34 @@
      <string>simulated shading</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_17">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>80</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>spher position X / Y</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="showLightsourceCB">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>530</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>visualize Lightsource</string>
+    </property>
+   </widget>
    <zorder>pushButton</zorder>
-   <zorder>lightPos_X</zorder>
-   <zorder>label_2</zorder>
-   <zorder>label_3</zorder>
-   <zorder>lightPos_Y</zorder>
-   <zorder>lightPos_Z</zorder>
    <zorder>raytracing_ProgressBar</zorder>
-   <zorder>label_4</zorder>
-   <zorder>label_5</zorder>
-   <zorder>label_6</zorder>
-   <zorder>label_7</zorder>
-   <zorder>lightPos_X_2</zorder>
-   <zorder>lightPos_Y_2</zorder>
-   <zorder>lightPos_Z_2</zorder>
-   <zorder>radioButton</zorder>
-   <zorder>radioButton_2</zorder>
    <zorder>colorSliderR</zorder>
    <zorder>colorSliderG</zorder>
    <zorder>colorSliderB</zorder>
@@ -509,7 +357,6 @@
    <zorder>label_10</zorder>
    <zorder>label_11</zorder>
    <zorder>spherePosSliderY</zorder>
-   <zorder>spherePosSliderX</zorder>
    <zorder>colorPreviewLabel</zorder>
    <zorder>lightPosSliderY</zorder>
    <zorder>label_12</zorder>
@@ -521,6 +368,9 @@
    <zorder>openGLWidget</zorder>
    <zorder>label_15</zorder>
    <zorder>label_16</zorder>
+   <zorder>spherePosSliderX</zorder>
+   <zorder>label_17</zorder>
+   <zorder>showLightsourceCB</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
